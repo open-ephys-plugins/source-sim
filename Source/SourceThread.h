@@ -62,6 +62,8 @@ public:
 	SourceThread(SourceNode* sn);
 	~SourceThread();
 
+	void generateBuffers();
+
 	bool updateBuffer();
 
 	void updateChannels();
@@ -150,6 +152,8 @@ public:
 	static DataThread* createDataThread(SourceNode* sn);
 
 	GenericEditor* createEditor(SourceNode* sn);
+
+	int64 numSamples;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SourceThread);
 

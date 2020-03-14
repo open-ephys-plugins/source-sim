@@ -1,0 +1,22 @@
+[
+{
+  "directory": "/home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/build",
+  "command": "/usr/bin/g++-7  -DDEBUG=1 -DJUCE_DISABLE_NATIVE_FILECHOOSERS=1 -DOEPLUGIN -DSourceSim_EXPORTS -D_DEBUG=1 -I/home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/../../plugin-GUI/JuceLibraryCode -I/home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/../../plugin-GUI/JuceLibraryCode/modules -I/home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/../../plugin-GUI/Plugins/Headers -I/home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/../../plugin-GUI/installed_libs/include  -g -fPIC   -fPIC -rdynamic -O3 -std=gnu++11 -o CMakeFiles/SourceSim.dir/Source/OpenEphysLib.cpp.o -c /home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/Source/OpenEphysLib.cpp",
+  "file": "/home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/Source/OpenEphysLib.cpp"
+},
+{
+  "directory": "/home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/build",
+  "command": "/usr/bin/g++-7  -DDEBUG=1 -DJUCE_DISABLE_NATIVE_FILECHOOSERS=1 -DOEPLUGIN -DSourceSim_EXPORTS -D_DEBUG=1 -I/home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/../../plugin-GUI/JuceLibraryCode -I/home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/../../plugin-GUI/JuceLibraryCode/modules -I/home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/../../plugin-GUI/Plugins/Headers -I/home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/../../plugin-GUI/installed_libs/include  -g -fPIC   -fPIC -rdynamic -O3 -std=gnu++11 -o CMakeFiles/SourceSim.dir/Source/SourceSim.cpp.o -c /home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/Source/SourceSim.cpp",
+  "file": "/home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/Source/SourceSim.cpp"
+},
+{
+  "directory": "/home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/build",
+  "command": "/usr/bin/g++-7  -DDEBUG=1 -DJUCE_DISABLE_NATIVE_FILECHOOSERS=1 -DOEPLUGIN -DSourceSim_EXPORTS -D_DEBUG=1 -I/home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/../../plugin-GUI/JuceLibraryCode -I/home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/../../plugin-GUI/JuceLibraryCode/modules -I/home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/../../plugin-GUI/Plugins/Headers -I/home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/../../plugin-GUI/installed_libs/include  -g -fPIC   -fPIC -rdynamic -O3 -std=gnu++11 -o CMakeFiles/SourceSim.dir/Source/SourceSimEditor.cpp.o -c /home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/Source/SourceSimEditor.cpp",
+  "file": "/home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/Source/SourceSimEditor.cpp"
+},
+{
+  "directory": "/home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/build",
+  "command": "/usr/bin/g++-7  -DDEBUG=1 -DJUCE_DISABLE_NATIVE_FILECHOOSERS=1 -DOEPLUGIN -DSourceSim_EXPORTS -D_DEBUG=1 -I/home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/../../plugin-GUI/JuceLibraryCode -I/home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/../../plugin-GUI/JuceLibraryCode/modules -I/home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/../../plugin-GUI/Plugins/Headers -I/home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/../../plugin-GUI/installed_libs/include  -g -fPIC   -fPIC -rdynamic -O3 -std=gnu++11 -o CMakeFiles/SourceSim.dir/Source/SourceThread.cpp.o -c /home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/Source/SourceThread.cpp",
+  "file": "/home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/Source/SourceThread.cpp"
+}
+]

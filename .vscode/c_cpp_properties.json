@@ -3,7 +3,8 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "/home/pavel/Projects/Allen/OpenEphys/plugin-GUI/Plugins/Headers"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
