@@ -149,7 +149,7 @@ public:
 
 	static DataThread* createDataThread(SourceNode* sn);
 
-	//GenericEditor* createEditor(SourceNode* sn);
+	GenericEditor* createEditor(SourceNode* sn);
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SourceThread);
 

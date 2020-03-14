@@ -22,18 +22,19 @@
 */
 
 #include "SourceThread.h"
+#include "SourceSimEditor.h"
 
 DataThread* SourceThread::createDataThread(SourceNode *sn)
 {
 	return new SourceThread(sn);
 }
 
-/*
+
 GenericEditor* SourceThread::createEditor(SourceNode* sn)
 {
-    return new NeuropixEditor(sn, this, true);
+    return new SourceSimEditor(sn, this, true);
 }
-*/
+
 
 SourceThread::SourceThread(SourceNode* sn) : 
 	DataThread(sn),
