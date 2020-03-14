@@ -23,6 +23,7 @@
 
 #include "SourceThread.h"
 #include "SourceSimEditor.h"
+#include <cmath>
 
 DataThread* SourceThread::createDataThread(SourceNode *sn)
 {
@@ -50,7 +51,7 @@ SourceThread::~SourceThread()
 
 void SourceThread::generateBuffers()
 {
-    sourceBuffers.add(new DataBuffer(384,1000));
+    sourceBuffers.add(new DataBuffer(10,1000));
 }
 
 bool SourceThread::foundInputSource()
@@ -73,6 +74,7 @@ bool SourceThread::startAcquisition()
     startThread();
 
 	//startTimer(500); // wait for signal chain to be built
+    t1 = high_resolution_clock::now();
 	
     return true;
 }
@@ -120,7 +122,7 @@ int SourceThread::getNumDataOutputs(DataChannel::DataChannelTypes type, int subP
 {
 
 	if (type == DataChannel::DataChannelTypes::HEADSTAGE_CHANNEL)
-		return 384;
+		return 10;
 	else
 		return 0;
 
@@ -129,13 +131,13 @@ int SourceThread::getNumDataOutputs(DataChannel::DataChannelTypes type, int subP
 /** Returns the number of TTL channels that each subprocessor generates*/
 int SourceThread::getNumTTLOutputs(int subProcessorIdx) const 
 {
-	return 0;
+	return 1;
 }
 
 /** Returns the sample rate of the data source.*/
 float SourceThread::getSampleRate(int subProcessorIdx) const
 {
-	return 44100.0f;
+	return 30000.0f;
 }
 
 /** Returns the volts per bit of the data source.*/
@@ -146,18 +148,25 @@ float SourceThread::getBitVolts(const DataChannel* chan) const
 
 bool SourceThread::updateBuffer()
 {
-    float apSamples[384];
-    int64 ap_timestamp = numSamples;
-    numSamples += 100;
-    uint64 eventCode = 0;
 
-    for (int i = 0; i < 100; i++)
+    t2 = high_resolution_clock::now();
+    duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+
+    if (time_span.count() > 0.0066666666666667)
     {
-        for (int j = 0; j < 384; j++)
+        float apSamples[10];
+        eventCode = (!(bool)eventCode);
+
+        for (int i = 0; i < 200; i++)
         {
-            apSamples[j] = numSamples % 1000;
+            for (int j = 0; j < 10; j++)
+            {
+                apSamples[j] = 1000*eventCode;
+            }
+            numSamples++;
+            sourceBuffers.getLast()->addToBuffer(apSamples, &numSamples, &eventCode, 1);
         }
-        sourceBuffers.getLast()->addToBuffer(apSamples, &ap_timestamp, &eventCode, 1);
+        t1 = high_resolution_clock::now();
     }
     return true;
 
