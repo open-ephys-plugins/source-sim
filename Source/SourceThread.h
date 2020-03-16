@@ -25,16 +25,11 @@
 #ifndef __SOURCESIMTHREAD_H__
 #define __SOURCESIMTHREAD_H__
 
+#include "SourceSim.h"
+
 #include <DataThreadHeaders.h>
 #include <stdio.h>
 #include <string.h>
-
-#include <iostream>
-#include <ctime>
-#include <ratio>
-#include <chrono>
-
-using namespace std::chrono;
 
 class SourceNode;
 class SourceThread;
@@ -160,11 +155,7 @@ public:
 
 	GenericEditor* createEditor(SourceNode* sn);
 
-	int64 numSamples;
-	uint64 eventCode;
-
-	high_resolution_clock::time_point t1;
-	high_resolution_clock::time_point t2;
+	OwnedArray<SourceSim> sources;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SourceThread);
 

@@ -52,6 +52,8 @@ SourceThread::~SourceThread()
 void SourceThread::generateBuffers()
 {
     sourceBuffers.add(new DataBuffer(10,1000));
+    sources.add(new SourceSim());
+    sources.getLast()->buffer = sourceBuffers.getLast();
 }
 
 bool SourceThread::foundInputSource()
@@ -71,10 +73,11 @@ bool SourceThread::startAcquisition()
 
 	sourceBuffers.getLast()->clear();
 
-    startThread();
+    sources.getLast()->startThread();
+
+    this->startThread();
 
 	//startTimer(500); // wait for signal chain to be built
-    t1 = high_resolution_clock::now();
 	
     return true;
 }
@@ -97,6 +100,8 @@ void SourceThread::stopRecording()
 /** Stops data transfer.*/
 bool SourceThread::stopAcquisition()
 {
+
+    sources.getLast()->signalThreadShouldExit();
 
     if (isThreadRunning())
         signalThreadShouldExit();
@@ -137,7 +142,7 @@ int SourceThread::getNumTTLOutputs(int subProcessorIdx) const
 /** Returns the sample rate of the data source.*/
 float SourceThread::getSampleRate(int subProcessorIdx) const
 {
-	return 30000.0f;
+    return 30000.0f;
 }
 
 /** Returns the volts per bit of the data source.*/
@@ -148,28 +153,7 @@ float SourceThread::getBitVolts(const DataChannel* chan) const
 
 bool SourceThread::updateBuffer()
 {
-
-    t2 = high_resolution_clock::now();
-    duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
-
-    if (time_span.count() > 0.0066666666666667)
-    {
-        float apSamples[10];
-        eventCode = (!(bool)eventCode);
-
-        for (int i = 0; i < 200; i++)
-        {
-            for (int j = 0; j < 10; j++)
-            {
-                apSamples[j] = 1000*eventCode;
-            }
-            numSamples++;
-            sourceBuffers.getLast()->addToBuffer(apSamples, &numSamples, &eventCode, 1);
-        }
-        t1 = high_resolution_clock::now();
-    }
     return true;
-
 }
 
 
