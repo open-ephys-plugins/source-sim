@@ -1,8 +1,10 @@
 #include "SourceSim.h"
 
-SourceSim::SourceSim() : Thread("Source Simulator")
+SourceSim::SourceSim(int channels, float sampleRate) : Thread("Source Simulator")
 {
-
+	numChannels = channels;
+	packetSize = 1;
+	this->sampleRate = sampleRate;
 }
 
 SourceSim::~SourceSim()
@@ -20,19 +22,19 @@ void SourceSim::run()
 		t2 = high_resolution_clock::now();
 		duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
 
-		if (time_span.count() > 0.0066666666666667)
+		if (time_span.count() > 1/(sampleRate / packetSize))
 		{
-			float apSamples[384];
+			float samples[numChannels];
 			eventCode = (!(bool)eventCode);
 
-			for (int i = 0; i < 200; i++)
+			for (int i = 0; i < packetSize; i++)
 			{
-				for (int j = 0; j < 10; j++)
+				for (int j = 0; j < numChannels; j++)
 				{
-					apSamples[j] = 1000*eventCode;
+					samples[j] = 1000*eventCode;
 				}
 				numSamples++;
-				buffer->addToBuffer(apSamples, &numSamples, &eventCode, 1);
+				buffer->addToBuffer(samples, &numSamples, &eventCode, 1);
 			}
 			t1 = high_resolution_clock::now();
 		}
@@ -40,4 +42,5 @@ void SourceSim::run()
 	}
 	 
 }
+
 

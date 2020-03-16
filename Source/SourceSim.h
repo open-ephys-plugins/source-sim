@@ -14,7 +14,7 @@ class SourceSim : public Thread
 {
 public:
 	/** The class constructor, used to initialize any members. */
-	SourceSim();
+	SourceSim(int channels, float sampleRate);
 
 	/** The class destructor, used to deallocate memory */
 	~SourceSim();
@@ -24,6 +24,9 @@ public:
 	DataBuffer* buffer;
 
 	//My properties
+	int numChannels;
+	int packetSize;
+	float sampleRate;
 	int64 numSamples;
 	uint64 eventCode;
 

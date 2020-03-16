@@ -51,19 +51,28 @@ SourceThread::~SourceThread()
 
 void SourceThread::generateBuffers()
 {
-    sourceBuffers.add(new DataBuffer(10,1000));
-    sources.add(new SourceSim());
+    //Add Neuropixels AP Band
+    int apChannels = 384;
+    sourceBuffers.add(new DataBuffer(apChannels,1000));
+    sources.add(new SourceSim(apChannels,30000.0f));
+    sources.getLast()->buffer = sourceBuffers.getLast();
+
+    //Add Neuropixels LFP Band
+    int lfpChannels = 384;
+    sourceBuffers.add(new DataBuffer(lfpChannels,1000));
+    sources.add(new SourceSim(lfpChannels,2501.0f));
+    sources.getLast()->buffer = sourceBuffers.getLast();
+
+    //Add NIDAQ AP Band
+    int adcChannels = 8;
+    sourceBuffers.add(new DataBuffer(adcChannels,1000));
+    sources.add(new SourceSim(adcChannels,29900.0f));
     sources.getLast()->buffer = sourceBuffers.getLast();
 }
 
 bool SourceThread::foundInputSource()
 {
     return true;
-}
-
-void SourceThread::setDefaultChannelNames()
-{
-
 }
 
 
@@ -73,18 +82,22 @@ bool SourceThread::startAcquisition()
 
 	sourceBuffers.getLast()->clear();
 
-    sources.getLast()->startThread();
+    for (int i = 0; i < sources.size(); i++)
+    {
+        sources[i]->startThread();
+    }
 
     this->startThread();
 
-	//startTimer(500); // wait for signal chain to be built
+    //Start NIDAQ w/ delay
+	//startTimer(300); 
 	
     return true;
 }
 
 void SourceThread::timerCallback()
 {
-	startThread();
+	sources.getLast()->startThread();
     stopTimer();
 }
 
@@ -101,7 +114,8 @@ void SourceThread::stopRecording()
 bool SourceThread::stopAcquisition()
 {
 
-    sources.getLast()->signalThreadShouldExit();
+    for (auto source : sources)
+        source->signalThreadShouldExit();
 
     if (isThreadRunning())
         signalThreadShouldExit();
@@ -115,11 +129,48 @@ bool SourceThread::usesCustomNames() const
 	return true;
 }
 
+void SourceThread::setDefaultChannelNames()
+{
+
+    int absChannel = 0;
+
+    //AP
+    for (int i = 0; i < sources[0]->numChannels; i++)
+    {
+        ChannelCustomInfo info;
+        info.name = "AP" + String(i + 1);
+        info.gain = 1.0f;
+        channelInfo.set(absChannel, info);
+        absChannel++;
+    }
+
+    //LFP
+    for (int i = 0; i < sources[1]->numChannels; i++)
+    {
+        ChannelCustomInfo info;
+        info.name = "LFP" + String(i + 1);
+        info.gain = 1.0f;
+        channelInfo.set(absChannel, info);
+        absChannel++;
+    }
+
+    //NIDAQ
+    for (int i = 0; i < sources[2]->numChannels; i++)
+    {
+        ChannelCustomInfo info;
+        info.name = "AI" + String(i + 1);
+        info.gain = 1.0f;
+        channelInfo.set(absChannel, info);
+        absChannel++;
+    }
+
+}
+
 
 /** Returns the number of virtual subprocessors this source can generate */
 unsigned int SourceThread::getNumSubProcessors() const
 {
-	return 1;
+	return sources.size();
 }
 
 /** Returns the number of continuous headstage channels the data source can provide.*/
@@ -127,9 +178,16 @@ int SourceThread::getNumDataOutputs(DataChannel::DataChannelTypes type, int subP
 {
 
 	if (type == DataChannel::DataChannelTypes::HEADSTAGE_CHANNEL)
-		return 10;
-	else
-		return 0;
+    {
+        if (subProcessorIdx == 0 || subProcessorIdx == 1)
+        {
+            return sources[subProcessorIdx]->numChannels;
+        }
+    }
+	else if (type == DataChannel::DataChannelTypes::ADC_CHANNEL && subProcessorIdx == 2)
+		return sources[subProcessorIdx]->numChannels;
+    
+    return 0;
 
 }
 
@@ -142,7 +200,9 @@ int SourceThread::getNumTTLOutputs(int subProcessorIdx) const
 /** Returns the sample rate of the data source.*/
 float SourceThread::getSampleRate(int subProcessorIdx) const
 {
-    return 30000.0f;
+
+    return sources[subProcessorIdx]->sampleRate;
+    
 }
 
 /** Returns the volts per bit of the data source.*/
