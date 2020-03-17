@@ -10,7 +10,7 @@
 
 using namespace std::chrono;
 
-class SourceSim : public Thread
+class SourceSim : public Thread, public Timer
 {
 public:
 	/** The class constructor, used to initialize any members. */
@@ -29,6 +29,8 @@ public:
 	float sampleRate;
 	int64 numSamples;
 	uint64 eventCode;
+
+	void timerCallback();
 
 	high_resolution_clock::time_point t1;
 	high_resolution_clock::time_point t2;

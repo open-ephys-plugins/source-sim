@@ -32,7 +32,15 @@ class SourceNode;
 class SourceSimCanvas;
 class SourceSimInterface;
 
-class SourceSimEditor : public VisualizerEditor, public ComboBox::Listener
+class NumericEntry : public Label
+{
+public:
+	NumericEntry(String name, String text) : Label(name, text) {};
+	~NumericEntry() {};
+	virtual TextEditor* createEditorComponent() override;
+};
+
+class SourceSimEditor : public VisualizerEditor, public ComboBox::Listener, public Label::Listener
 {
 public:
 	SourceSimEditor(GenericProcessor* parentNode, SourceThread* thread, bool useDefaultParameterEditors);
@@ -41,7 +49,8 @@ public:
 	void collapsedStateChanged() override;
 
 	void comboBoxChanged(ComboBox*);
-	void buttonEvent(Button* button);
+	void labelTextChanged (Label*);
+	void buttonEvent(Button*);
 
 	void saveEditorParameters(XmlElement*);
 	void loadEditorParameters(XmlElement*);
@@ -50,6 +59,12 @@ public:
 
 
 private:
+
+	ScopedPointer<Label> clockFreqLabel;
+	ScopedPointer<NumericEntry> clockFreqEntry;
+
+	ScopedPointer<Label> clockTolLabel;
+	ScopedPointer<NumericEntry> clockTolEntry;
 
 	Viewport* viewport;
 	SourceSimCanvas* canvas;

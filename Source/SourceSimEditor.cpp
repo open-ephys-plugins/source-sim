@@ -24,6 +24,14 @@
 #include "SourceThread.h"
 #include "SourceSimEditor.h"
 
+TextEditor* NumericEntry::createEditorComponent()
+{
+	TextEditor* const ed = Label::createEditorComponent();
+    ed->setInputRestrictions(4, "0123456789.");
+    return ed;
+}
+
+
 SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceThread* t, bool useDefaultParameterEditors)
  : VisualizerEditor(parentNode, useDefaultParameterEditors)
 {
@@ -33,14 +41,51 @@ SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceThread* t, 
 
     tabText = "Source Sim";
 
-	//comboBox = new ComboBox("MasterSelectComboBox");
-	//addAndMakeVisible(masterSelectBox);
+	clockFreqLabel = new Label("clkFreqLabel", "CLK (Hz)");
+	clockFreqLabel->setBounds(5,30,50,20);
+	addAndMakeVisible(clockFreqLabel);
+
+	clockFreqEntry = new NumericEntry("clkFreqEntry", "10");
+	clockFreqEntry->setBounds(55,30,40,20);
+	clockFreqEntry->setEditable(false, true);
+	clockFreqEntry->setColour(Label::backgroundColourId, Colours::grey);
+	clockFreqEntry->setColour(Label::backgroundWhenEditingColourId, Colours::white);
+	clockFreqEntry->setJustificationType(Justification::centredRight);
+	clockFreqEntry->addListener(this);
+	addAndMakeVisible(clockFreqEntry);
+
+	clockTolLabel = new Label("clkFreqLabel", "+/- ");
+	clockTolLabel->setBounds(95,30,30,20);
+	addAndMakeVisible(clockTolLabel);
+
+	clockTolEntry = new NumericEntry("clkFreqEntry", "0.001");
+	clockTolEntry->setBounds(120,30,40,20);
+	clockTolEntry->setEditable(false, true);
+	clockTolEntry->setColour(Label::backgroundColourId, Colours::grey);
+	clockTolEntry->setColour(Label::backgroundWhenEditingColourId, Colours::white);
+	clockTolEntry->setJustificationType(Justification::centredRight);
+	clockTolEntry->addListener(this);
+	addAndMakeVisible(clockTolEntry);
 	
 }
 
 SourceSimEditor::~SourceSimEditor()
 {
 
+}
+
+void SourceSimEditor::labelTextChanged (Label* label)
+{
+	if (label == clockFreqEntry)
+	{
+		//Parse 
+		//thread->updateClkFrequency()
+	}
+	else
+	{
+		std::cout << "Tol changed" << std::endl;
+	}
+	
 }
 
 void SourceSimEditor::collapsedStateChanged()
