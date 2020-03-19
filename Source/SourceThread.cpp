@@ -52,22 +52,19 @@ SourceThread::~SourceThread()
 void SourceThread::generateBuffers()
 {
     //Add Neuropixels AP Band
-    int apChannels = 384;
-    sourceBuffers.add(new DataBuffer(apChannels,1000));
-    sources.add(new SourceSim(apChannels,30000.0f));
+    sources.add(new NPX_AP_BAND());
+    sourceBuffers.add(new DataBuffer(sources.getLast()->numChannels,1000));
     sources.getLast()->buffer = sourceBuffers.getLast();
 
-    //Add Neuropixels LFP Band
-    int lfpChannels = 384;
-    sourceBuffers.add(new DataBuffer(lfpChannels,1000));
-    sources.add(new SourceSim(lfpChannels,2501.0f));
+    // //Add Neuropixels LFP Band
+    sources.add(new NPX_LFP_BAND());
+    sourceBuffers.add(new DataBuffer(sources.getLast()->numChannels,1000));
     sources.getLast()->buffer = sourceBuffers.getLast();
 
-    //Add NIDAQ AP Band
-    int adcChannels = 8;
-    sourceBuffers.add(new DataBuffer(adcChannels,1000));
-    sources.add(new SourceSim(adcChannels,29900.0f));
-    sources.getLast()->buffer = sourceBuffers.getLast();
+    // //Add NIDAQ Band
+    // sourceBuffers.add(new DataBuffer(adcChannels,1000));
+    // sources.add(new SourceSim(adcChannels,29900.0f));
+    // sources.getLast()->buffer = sourceBuffers.getLast();
 }
 
 bool SourceThread::foundInputSource()
@@ -75,8 +72,6 @@ bool SourceThread::foundInputSource()
     return true;
 }
 
-
-/** Initializes data transfer.*/
 bool SourceThread::startAcquisition()
 {
 
@@ -88,9 +83,6 @@ bool SourceThread::startAcquisition()
     }
 
     this->startThread();
-
-    //Start NIDAQ w/ delay
-	//startTimer(300); 
 	
     return true;
 }
@@ -144,25 +136,25 @@ void SourceThread::setDefaultChannelNames()
         absChannel++;
     }
 
-    //LFP
-    for (int i = 0; i < sources[1]->numChannels; i++)
-    {
-        ChannelCustomInfo info;
-        info.name = "LFP" + String(i + 1);
-        info.gain = 1.0f;
-        channelInfo.set(absChannel, info);
-        absChannel++;
-    }
+    // //LFP
+    // for (int i = 0; i < sources[1]->numChannels; i++)
+    // {
+    //     ChannelCustomInfo info;
+    //     info.name = "LFP" + String(i + 1);
+    //     info.gain = 1.0f;
+    //     channelInfo.set(absChannel, info);
+    //     absChannel++;
+    // }
 
-    //NIDAQ
-    for (int i = 0; i < sources[2]->numChannels; i++)
-    {
-        ChannelCustomInfo info;
-        info.name = "AI" + String(i + 1);
-        info.gain = 1.0f;
-        channelInfo.set(absChannel, info);
-        absChannel++;
-    }
+    // //NIDAQ
+    // for (int i = 0; i < sources[2]->numChannels; i++)
+    // {
+    //     ChannelCustomInfo info;
+    //     info.name = "AI" + String(i + 1);
+    //     info.gain = 1.0f;
+    //     channelInfo.set(absChannel, info);
+    //     absChannel++;
+    // }
 
 }
 

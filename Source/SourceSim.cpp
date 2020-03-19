@@ -2,16 +2,16 @@
 
 #define CLOCK_PERIOD_IN_MS 500
 
-SourceSim::SourceSim(int channels, float sampleRate) : Thread("Source Simulator")
+SourceSim::SourceSim(String name, int channels, float sampleRate) : Thread(name)
 {
+	this->name = name;
 	numChannels = channels;
-	packetSize = 500;
+	packetSize = 100;
 	this->sampleRate = sampleRate;
 }
 
 SourceSim::~SourceSim()
 {
-
 }
 
 void SourceSim::timerCallback()
@@ -21,6 +21,8 @@ void SourceSim::timerCallback()
 
 void SourceSim::run()
 {
+
+	numSamples = 0;
 
 	startTimer(CLOCK_PERIOD_IN_MS / 2);
 
@@ -33,24 +35,11 @@ void SourceSim::run()
 
 		if (time_span.count() > 1 / (sampleRate / packetSize))
 		{
-			float samples[numChannels];
-
-			for (int i = 0; i < packetSize; i++)
-			{
-				for (int j = 0; j < numChannels; j++)
-				{
-					samples[j] = 1000*eventCode;
-				}
-				numSamples++;
-				buffer->addToBuffer(samples, &numSamples, &eventCode, 1);
-			}
+			generateDataPacket();
 			t1 = high_resolution_clock::now();
 		}
 
 	}
 
 	stopTimer();
-	 
 }
-
-
