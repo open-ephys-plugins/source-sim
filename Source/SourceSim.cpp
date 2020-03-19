@@ -6,7 +6,7 @@ SourceSim::SourceSim(String name, int channels, float sampleRate) : Thread(name)
 {
 	this->name = name;
 	numChannels = channels;
-	packetSize = 100;
+	packetSize = 200;
 	this->sampleRate = sampleRate;
 }
 
@@ -24,7 +24,7 @@ void SourceSim::run()
 
 	numSamples = 0;
 
-	startTimer(CLOCK_PERIOD_IN_MS / 2);
+	//startTimer(CLOCK_PERIOD_IN_MS / 2);
 
 	t1 = high_resolution_clock::now();
 
@@ -41,5 +41,5 @@ void SourceSim::run()
 
 	}
 
-	stopTimer();
+	//stopTimer();
 }

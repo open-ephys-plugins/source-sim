@@ -52,14 +52,14 @@ SourceThread::~SourceThread()
 void SourceThread::generateBuffers()
 {
     //Add Neuropixels AP Band
-    sources.add(new NPX_AP_BAND());
+    sources.add(new APTrain());
     sourceBuffers.add(new DataBuffer(sources.getLast()->numChannels,1000));
     sources.getLast()->buffer = sourceBuffers.getLast();
 
     // //Add Neuropixels LFP Band
-    sources.add(new NPX_LFP_BAND());
-    sourceBuffers.add(new DataBuffer(sources.getLast()->numChannels,1000));
-    sources.getLast()->buffer = sourceBuffers.getLast();
+    // sources.add(new NPX_LFP_BAND());
+    // sourceBuffers.add(new DataBuffer(sources.getLast()->numChannels,1000));
+    // sources.getLast()->buffer = sourceBuffers.getLast();
 
     // //Add NIDAQ Band
     // sourceBuffers.add(new DataBuffer(adcChannels,1000));

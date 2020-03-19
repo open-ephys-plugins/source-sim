@@ -7,6 +7,8 @@
 #include <ratio>
 #include <chrono>
 
+#define PI 3.14159f
+
 using namespace std::chrono;
 
 /* Source Simulator Class to simulate actual sources generating data into OpenEphys */
@@ -55,7 +57,7 @@ public:
 			for (int j = 0; j < numChannels; j++)
 			{
 				//Generate sine wave at 60 Hz with amplitude 1000
-				samples[j] = 1000.0f*sin(2*3.14159*(float)numSamples/(sampleRate / 60.0f));
+				samples[j] = 1000.0f*sin(2*PI*(float)numSamples/(sampleRate / 60.0f));
 			}
 			numSamples++;
 			buffer->addToBuffer(samples, &numSamples, &eventCode, 1);
@@ -80,7 +82,7 @@ public:
 			for (int j = 0; j < numChannels; j++)
 			{
 				//Generate sine wave at 60 Hz with amplitude 1000
-				samples[j] = 1000.0f*sin(2*3.14159*(float)numSamples/(sampleRate / 60.0f));
+				samples[j] = 1000.0f*sin(2*PI*(float)numSamples/(sampleRate / 60.0f));
 			}
 			numSamples++;
 			buffer->addToBuffer(samples, &numSamples, &eventCode, 1);
@@ -89,25 +91,72 @@ public:
 	};
 };
 
-// 	void run();
-// };
+#define INITIATION_POTENTIAL_START_TIME_IN_MS 0
+#define DEPOLARIZATION_START_TIME_IN_MS 0.8f
+#define REPOLARIZATION_START_TIME_IN_MS 1.3f
+#define HYPERPOLARIZATION_START_TIME_IN_MS 1.8f
+#define REFRACTORY_PERIOD_DURAION_IN_MS 5.0f;
 
-// class NIDAQ : public SourceSim
-// {
-// public: 
-// 	NIDAQ() : SourceSim(8, 30000.0f) {};
-// 	~NIDAQ();
+#define RESTING_MEMBRANE_POTENTATION_IN_MV -90.0f
+#define THRESHOLD_POTENTIAL_IN_MV -65.0f
+#define PEAK_DEPOLARIZATION_POTENTIAL_IN_MV 35.0f
 
-// 	void run();
-// };
+/* Simulates AP signal based on crude piece-wise function */
+class APTrain : public SourceSim
+{
+public:
+	APTrain() : SourceSim("APT", 10, 30000) {};
+	~APTrain() {};
 
-// class APTrain : public SourceSim
-// {
-// public:
-// 	APTrain() : SourceSim(10, 30000) {};
-// 	~APTrain();
+	void generateDataPacket() {
 
-// 	void run();
-// };
+		float samples[numChannels];
+		float sample_out;
+
+		for (int i = 0; i < packetSize; i++)
+		{
+
+			int sampleNum = numSamples % (int)sampleRate;
+			float time = 1000.0f * (float)sampleNum / sampleRate;
+
+			if (time < DEPOLARIZATION_START_TIME_IN_MS) 
+			{
+				std::cout << time << ":";
+				eventCode = 1;
+				sample_out = RESTING_MEMBRANE_POTENTATION_IN_MV + 25.0f * time / (DEPOLARIZATION_START_TIME_IN_MS);
+				std::cout << sample_out << std::endl;
+			}
+			else if (time < REPOLARIZATION_START_TIME_IN_MS)
+			{
+				std::cout << time << ":";
+				time -= DEPOLARIZATION_START_TIME_IN_MS;
+				sample_out = THRESHOLD_POTENTIAL_IN_MV + (PEAK_DEPOLARIZATION_POTENTIAL_IN_MV - THRESHOLD_POTENTIAL_IN_MV) * time / (REPOLARIZATION_START_TIME_IN_MS - DEPOLARIZATION_START_TIME_IN_MS);
+				std::cout << sample_out << std::endl;
+			}
+			else if (time < HYPERPOLARIZATION_START_TIME_IN_MS)
+			{ 
+				std::cout << time << ":";
+				time -= REPOLARIZATION_START_TIME_IN_MS;
+				sample_out = PEAK_DEPOLARIZATION_POTENTIAL_IN_MV - (PEAK_DEPOLARIZATION_POTENTIAL_IN_MV - THRESHOLD_POTENTIAL_IN_MV) * time / (HYPERPOLARIZATION_START_TIME_IN_MS - REPOLARIZATION_START_TIME_IN_MS);
+				std::cout << sample_out << std::endl;
+			}
+			else //TODO: Refractory period
+			{
+				eventCode = 0;
+				sample_out = -90.0f;
+			}
+
+			for (int j = 0; j < numChannels; j++)
+			{
+				samples[j] = sample_out;
+			}
+			numSamples++;
+			buffer->addToBuffer(samples, &numSamples, &eventCode, 1);
+		}
+
+	};
+
+
+};
 
 #endif
