@@ -1,7 +1,0 @@
-/home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/build/CMakeFiles/install/strip.dir
-/home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/build/CMakeFiles/edit_cache.dir
-/home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/build/CMakeFiles/rebuild_cache.dir
-/home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/build/CMakeFiles/list_install_components.dir
-/home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/build/CMakeFiles/SourceSim.dir
-/home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/build/CMakeFiles/install/local.dir
-/home/pavel/Projects/Allen/OpenEphys/OEPlugins/SourceSim/build/CMakeFiles/install.dir
