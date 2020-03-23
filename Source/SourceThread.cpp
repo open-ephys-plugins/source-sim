@@ -25,6 +25,8 @@
 #include "SourceSimEditor.h"
 #include <cmath>
 
+#define NUM_PROBES 2
+
 DataThread* SourceThread::createDataThread(SourceNode *sn)
 {
 	return new SourceThread(sn);
@@ -51,20 +53,26 @@ SourceThread::~SourceThread()
 
 void SourceThread::generateBuffers()
 {
-    //Add Neuropixels AP Band
-    sources.add(new APTrain());
-    sourceBuffers.add(new DataBuffer(sources.getLast()->numChannels,1000));
-    sources.getLast()->buffer = sourceBuffers.getLast();
 
-    // //Add Neuropixels LFP Band
-    // sources.add(new NPX_LFP_BAND());
-    // sourceBuffers.add(new DataBuffer(sources.getLast()->numChannels,1000));
-    // sources.getLast()->buffer = sourceBuffers.getLast();
+    for (int i = 0; i < NUM_PROBES; i++)
+    {
+
+        //Add Neuropixels AP Band
+        sources.add(new NPX_AP_BAND());
+        sourceBuffers.add(new DataBuffer(sources.getLast()->numChannels,1000));
+        sources.getLast()->buffer = sourceBuffers.getLast();
+
+        //Add Neuropixels LFP Band
+        sources.add(new NPX_LFP_BAND());
+        sourceBuffers.add(new DataBuffer(sources.getLast()->numChannels,1000));
+        sources.getLast()->buffer = sourceBuffers.getLast();
+
+    }
 
     // //Add NIDAQ Band
-    // sourceBuffers.add(new DataBuffer(adcChannels,1000));
-    // sources.add(new SourceSim(adcChannels,29900.0f));
-    // sources.getLast()->buffer = sourceBuffers.getLast();
+    sources.add(new NIDAQ());
+    sourceBuffers.add(new DataBuffer(sources.getLast()->numChannels,1000));
+    sources.getLast()->buffer = sourceBuffers.getLast();
 }
 
 bool SourceThread::foundInputSource()
@@ -126,35 +134,40 @@ void SourceThread::setDefaultChannelNames()
 
     int absChannel = 0;
 
-    //AP
-    for (int i = 0; i < sources[0]->numChannels; i++)
+    for (int i = 0; i < NUM_PROBES; i+=2)
+    {
+
+        //AP
+        for (int j = 0; j < sources[i]->numChannels; j++)
+        {
+            ChannelCustomInfo info;
+            info.name = "AP" + String(j + 1);
+            info.gain = 1.0f;
+            channelInfo.set(absChannel, info);
+            absChannel++;
+        }
+
+        //LFP
+        for (int j = 0; j < sources[i+1]->numChannels; j++)
+        {
+            ChannelCustomInfo info;
+            info.name = "LFP" + String(j + 1);
+            info.gain = 1.0f;
+            channelInfo.set(absChannel, info);
+            absChannel++;
+        }
+
+    }
+
+    // //NIDAQ
+    for (int i = 0; i < sources[sources.size()-1]->numChannels; i++)
     {
         ChannelCustomInfo info;
-        info.name = "AP" + String(i + 1);
+        info.name = "AI" + String(i + 1);
         info.gain = 1.0f;
         channelInfo.set(absChannel, info);
         absChannel++;
     }
-
-    // //LFP
-    // for (int i = 0; i < sources[1]->numChannels; i++)
-    // {
-    //     ChannelCustomInfo info;
-    //     info.name = "LFP" + String(i + 1);
-    //     info.gain = 1.0f;
-    //     channelInfo.set(absChannel, info);
-    //     absChannel++;
-    // }
-
-    // //NIDAQ
-    // for (int i = 0; i < sources[2]->numChannels; i++)
-    // {
-    //     ChannelCustomInfo info;
-    //     info.name = "AI" + String(i + 1);
-    //     info.gain = 1.0f;
-    //     channelInfo.set(absChannel, info);
-    //     absChannel++;
-    // }
 
 }
 
@@ -169,14 +182,11 @@ unsigned int SourceThread::getNumSubProcessors() const
 int SourceThread::getNumDataOutputs(DataChannel::DataChannelTypes type, int subProcessorIdx) const
 {
 
-	if (type == DataChannel::DataChannelTypes::HEADSTAGE_CHANNEL)
+	if (type == DataChannel::DataChannelTypes::HEADSTAGE_CHANNEL && subProcessorIdx < 2 * NUM_PROBES)
     {
-        if (subProcessorIdx == 0 || subProcessorIdx == 1)
-        {
             return sources[subProcessorIdx]->numChannels;
-        }
     }
-	else if (type == DataChannel::DataChannelTypes::ADC_CHANNEL && subProcessorIdx == 2)
+	else if (type == DataChannel::DataChannelTypes::ADC_CHANNEL && subProcessorIdx >= 2 * NUM_PROBES)
 		return sources[subProcessorIdx]->numChannels;
     
     return 0;

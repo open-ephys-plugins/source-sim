@@ -1,13 +1,13 @@
 #include "SourceSim.h"
 
-#define CLOCK_PERIOD_IN_MS 500
-
 SourceSim::SourceSim(String name, int channels, float sampleRate) : Thread(name)
 {
 	this->name = name;
 	numChannels = channels;
-	packetSize = 200;
+	packetSize = 10;
 	this->sampleRate = sampleRate;
+	clk_period = 1; //s
+	clk_tol = 0.001; //s
 }
 
 SourceSim::~SourceSim()
@@ -24,7 +24,7 @@ void SourceSim::run()
 
 	numSamples = 0;
 
-	//startTimer(CLOCK_PERIOD_IN_MS / 2);
+	startTimer(1000 * clk_period  / 2);
 
 	t1 = high_resolution_clock::now();
 
@@ -41,5 +41,5 @@ void SourceSim::run()
 
 	}
 
-	//stopTimer();
+	stopTimer();
 }

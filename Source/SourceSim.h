@@ -30,6 +30,8 @@ public:
 	float sampleRate;
 	int64 numSamples;
 	uint64 eventCode;
+	float clk_period;
+	float clk_tol;
 
 	void timerCallback();
 
@@ -91,6 +93,31 @@ public:
 	};
 };
 
+/* Simulates NIDAQ Analog + Digital acquisition w/ 60 Hz sine wave */
+class NIDAQ : public SourceSim
+{
+public:
+	NIDAQ() : SourceSim("AI", 8, 30000.0f) {};
+	~NIDAQ() {};
+
+	void generateDataPacket() {
+
+		float samples[numChannels];
+
+		for (int i = 0; i < packetSize; i++)
+		{
+			for (int j = 0; j < numChannels; j++)
+			{
+				//Generate sine wave at 60 Hz with amplitude 1000
+				samples[j] = 1000.0f*sin(2*PI*(float)numSamples/(sampleRate / 60.0f));
+			}
+			numSamples++;
+			buffer->addToBuffer(samples, &numSamples, &eventCode, 1);
+		}
+
+	};
+};
+
 #define INITIATION_POTENTIAL_START_TIME_IN_MS 0
 #define DEPOLARIZATION_START_TIME_IN_MS 0.8f
 #define REPOLARIZATION_START_TIME_IN_MS 1.3f
@@ -121,28 +148,20 @@ public:
 
 			if (time < DEPOLARIZATION_START_TIME_IN_MS) 
 			{
-				std::cout << time << ":";
-				eventCode = 1;
 				sample_out = RESTING_MEMBRANE_POTENTATION_IN_MV + 25.0f * time / (DEPOLARIZATION_START_TIME_IN_MS);
-				std::cout << sample_out << std::endl;
 			}
 			else if (time < REPOLARIZATION_START_TIME_IN_MS)
 			{
-				std::cout << time << ":";
 				time -= DEPOLARIZATION_START_TIME_IN_MS;
 				sample_out = THRESHOLD_POTENTIAL_IN_MV + (PEAK_DEPOLARIZATION_POTENTIAL_IN_MV - THRESHOLD_POTENTIAL_IN_MV) * time / (REPOLARIZATION_START_TIME_IN_MS - DEPOLARIZATION_START_TIME_IN_MS);
-				std::cout << sample_out << std::endl;
 			}
 			else if (time < HYPERPOLARIZATION_START_TIME_IN_MS)
 			{ 
-				std::cout << time << ":";
 				time -= REPOLARIZATION_START_TIME_IN_MS;
 				sample_out = PEAK_DEPOLARIZATION_POTENTIAL_IN_MV - (PEAK_DEPOLARIZATION_POTENTIAL_IN_MV - THRESHOLD_POTENTIAL_IN_MV) * time / (HYPERPOLARIZATION_START_TIME_IN_MS - REPOLARIZATION_START_TIME_IN_MS);
-				std::cout << sample_out << std::endl;
 			}
 			else //TODO: Refractory period
 			{
-				eventCode = 0;
 				sample_out = -90.0f;
 			}
 
