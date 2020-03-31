@@ -29,6 +29,8 @@ public:
 	int packetSize;
 	float sampleRate;
 	int64 numSamples;
+
+	bool clkEnabled;
 	uint64 eventCode;
 	float clk_period;
 	float clk_tol;
@@ -37,6 +39,8 @@ public:
 
 	high_resolution_clock::time_point t1;
 	high_resolution_clock::time_point t2;
+
+	void updateClk(bool enable);
 
 	virtual void generateDataPacket() = 0;
 
@@ -108,8 +112,8 @@ public:
 		{
 			for (int j = 0; j < numChannels; j++)
 			{
-				//Generate sine wave at 60 Hz with amplitude 1000
-				samples[j] = 1000.0f*sin(2*PI*(float)numSamples/(sampleRate / 60.0f));
+				//Generate sine wave at 10 Hz with amplitude 1000
+				samples[j] = 1000.0f*sin(2*PI*(float)numSamples/(sampleRate / 10.0f));
 			}
 			numSamples++;
 			buffer->addToBuffer(samples, &numSamples, &eventCode, 1);

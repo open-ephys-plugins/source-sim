@@ -6,8 +6,11 @@ SourceSim::SourceSim(String name, int channels, float sampleRate) : Thread(name)
 	numChannels = channels;
 	packetSize = 10;
 	this->sampleRate = sampleRate;
+
+	clkEnabled = false;
 	clk_period = 1; //s
-	clk_tol = 0.001; //s
+	clk_tol = 0.001; //sc
+	
 }
 
 SourceSim::~SourceSim()
@@ -16,7 +19,16 @@ SourceSim::~SourceSim()
 
 void SourceSim::timerCallback()
 {
-	eventCode = (!(bool)eventCode);
+	if (clkEnabled)
+	{
+		eventCode = (!(bool)eventCode);
+	}
+
+}
+
+void SourceSim::updateClk(bool enable)
+{
+	clkEnabled = enable;
 }
 
 void SourceSim::run()

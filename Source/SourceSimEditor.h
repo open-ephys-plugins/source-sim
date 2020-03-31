@@ -50,7 +50,7 @@ public:
 
 	void comboBoxChanged(ComboBox*);
 	void labelTextChanged (Label*);
-	void buttonEvent(Button*);
+	void buttonEvent(Button*) override;
 
 	void saveEditorParameters(XmlElement*);
 	void loadEditorParameters(XmlElement*);
@@ -65,6 +65,17 @@ private:
 
 	ScopedPointer<Label> clockTolLabel;
 	ScopedPointer<NumericEntry> clockTolEntry;
+
+	ScopedPointer<Label> NPX1Label;
+	ScopedPointer<ToggleButton> NPX1ClkEnable;
+
+	ScopedPointer<Label> NPX2Label;
+	ScopedPointer<ToggleButton> NPX2ClkEnable;
+
+	ScopedPointer<Label> NIDAQLabel;
+	ScopedPointer<ToggleButton> NIDAQClkEnable;
+
+	ScopedPointer<UtilityButton> addDeviceButton;
 
 	Viewport* viewport;
 	SourceSimCanvas* canvas;

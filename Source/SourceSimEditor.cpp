@@ -66,7 +66,34 @@ SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceThread* t, 
 	clockTolEntry->setJustificationType(Justification::centredRight);
 	clockTolEntry->addListener(this);
 	addAndMakeVisible(clockTolEntry);
-	
+
+	NPX1Label = new Label("NPXProbe1", "NPX Probe 1");
+	NPX1Label->setBounds(5,55,120,20);
+	addAndMakeVisible(NPX1Label);
+
+	NPX1ClkEnable = new juce::ToggleButton("");
+	NPX1ClkEnable->setBounds(125, 55, 20, 20);
+	NPX1ClkEnable->addListener(this);
+	addAndMakeVisible(NPX1ClkEnable);
+
+	NPX2Label = new Label("NPXProbe2", "NPX Probe 2");
+	NPX2Label->setBounds(5,80,120,20);
+	addAndMakeVisible(NPX2Label);
+
+	NPX2ClkEnable = new juce::ToggleButton("");
+	NPX2ClkEnable->setBounds(125, 80, 20, 20);
+	NPX2ClkEnable->addListener(this);
+	addAndMakeVisible(NPX2ClkEnable);
+
+	NIDAQLabel = new Label("NIDAQ", "NIDAQ");
+	NIDAQLabel->setBounds(5,105,120,20);
+	addAndMakeVisible(NIDAQLabel);
+
+	NIDAQClkEnable = new juce::ToggleButton("");
+	NIDAQClkEnable->setBounds(125, 105, 20, 20);
+	NIDAQClkEnable->addListener(this);
+	addAndMakeVisible(NIDAQClkEnable);
+
 }
 
 SourceSimEditor::~SourceSimEditor()
@@ -99,8 +126,26 @@ void SourceSimEditor::comboBoxChanged(ComboBox* comboBox)
 
 }
 
+
+
 void SourceSimEditor::buttonEvent(Button* button)
 {
+
+	int subProcIdx;
+	if (button == (Button*)NPX1ClkEnable)
+	{
+		thread->updateClk(0, button->getToggleState());
+		thread->updateClk(1, button->getToggleState());
+	}
+	else if (button == (Button*)NPX2ClkEnable)
+	{
+		thread->updateClk(2, button->getToggleState());
+		thread->updateClk(3, button->getToggleState());
+	}
+	if (button == (Button*)NIDAQClkEnable)
+	{
+		thread->updateClk(4, button->getToggleState());
+	}
 
 }
 
@@ -148,12 +193,14 @@ void SourceSimEditor::loadEditorParameters(XmlElement* xml)
 
 Visualizer* SourceSimEditor::createNewCanvas(void)
 {
+	/*
     std::cout << "Button clicked..." << std::endl;
     GenericProcessor* processor = (GenericProcessor*) getProcessor();
     std::cout << "Got processor." << std::endl;
     canvas = new SourceSimCanvas(processor, this, thread);
     std::cout << "Created canvas." << std::endl;
-    return canvas;
+	*/
+    return nullptr;
 }
 
 
@@ -195,9 +242,10 @@ SourceSimCanvas::SourceSimCanvas(GenericProcessor* p, SourceSimEditor* editor_, 
 
     sourceSimViewport->setViewedComponent(sourceSimInterfaces[0], false);
     addAndMakeVisible(sourceSimViewport);
-*/
+
     resized();
     update();
+	*/
 }
 
 SourceSimCanvas::~SourceSimCanvas()

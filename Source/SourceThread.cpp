@@ -51,6 +51,11 @@ SourceThread::~SourceThread()
 
 }
 
+void SourceThread::updateClk(int subProcIdx, bool enable)
+{
+    sources[subProcIdx]->updateClk(enable);
+}
+
 void SourceThread::generateBuffers()
 {
 
@@ -196,7 +201,10 @@ int SourceThread::getNumDataOutputs(DataChannel::DataChannelTypes type, int subP
 /** Returns the number of TTL channels that each subprocessor generates*/
 int SourceThread::getNumTTLOutputs(int subProcessorIdx) const 
 {
-	return 1;
+    if (subProcessorIdx < 4)
+	    return 1;
+    else 
+        return 8;
 }
 
 /** Returns the sample rate of the data source.*/
