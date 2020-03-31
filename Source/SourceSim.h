@@ -41,6 +41,7 @@ public:
 	high_resolution_clock::time_point t2;
 
 	void updateClk(bool enable);
+	void updateClkFreq(int freq, float tol);
 
 	virtual void generateDataPacket() = 0;
 

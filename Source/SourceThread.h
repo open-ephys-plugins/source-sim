@@ -157,7 +157,8 @@ public:
 
 	OwnedArray<SourceSim> sources;
 
-	void updateClk(int subProcIdx, bool enable);
+	void updateClkFreq(int freq, float tol);
+	void updateClkEnable(int subProcIdx, bool enable);
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SourceThread);
 

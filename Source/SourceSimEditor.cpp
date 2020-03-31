@@ -58,7 +58,7 @@ SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceThread* t, 
 	clockTolLabel->setBounds(95,30,30,20);
 	addAndMakeVisible(clockTolLabel);
 
-	clockTolEntry = new NumericEntry("clkFreqEntry", "0.001");
+	clockTolEntry = new NumericEntry("clkFreqEntry", "0");
 	clockTolEntry->setBounds(120,30,40,20);
 	clockTolEntry->setEditable(false, true);
 	clockTolEntry->setColour(Label::backgroundColourId, Colours::grey);
@@ -103,15 +103,25 @@ SourceSimEditor::~SourceSimEditor()
 
 void SourceSimEditor::labelTextChanged (Label* label)
 {
+
+	int freq = clockFreqEntry->getText().getIntValue();
+	float tol = clockTolEntry->getText().getFloatValue();
+
 	if (label == clockFreqEntry)
 	{
-		//Parse 
-		//thread->updateClkFrequency()
+		/* Restrict to integer values only */
+		label->setText(String(freq),juce::NotificationType::sendNotification);
 	}
-	else
+	else if (label == clockTolEntry)
 	{
-		std::cout << "Tol changed" << std::endl;
+		/*Restrict to % of clk freq */
+		if (!(tol <= (float)freq / 10))
+		{
+			label->setText("0", juce::NotificationType::sendNotification);
+			tol = 0;
+		}
 	}
+	thread->updateClkFreq(freq, tol);
 	
 }
 
@@ -134,17 +144,17 @@ void SourceSimEditor::buttonEvent(Button* button)
 	int subProcIdx;
 	if (button == (Button*)NPX1ClkEnable)
 	{
-		thread->updateClk(0, button->getToggleState());
-		thread->updateClk(1, button->getToggleState());
+		thread->updateClkEnable(0, button->getToggleState());
+		thread->updateClkEnable(1, button->getToggleState());
 	}
 	else if (button == (Button*)NPX2ClkEnable)
 	{
-		thread->updateClk(2, button->getToggleState());
-		thread->updateClk(3, button->getToggleState());
+		thread->updateClkEnable(2, button->getToggleState());
+		thread->updateClkEnable(3, button->getToggleState());
 	}
 	if (button == (Button*)NIDAQClkEnable)
 	{
-		thread->updateClk(4, button->getToggleState());
+		thread->updateClkEnable(4, button->getToggleState());
 	}
 
 }

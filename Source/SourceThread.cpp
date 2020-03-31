@@ -51,7 +51,18 @@ SourceThread::~SourceThread()
 
 }
 
-void SourceThread::updateClk(int subProcIdx, bool enable)
+void SourceThread::updateClkFreq(int freq, float tol)
+{
+    std::cout << "Update clk freq: " << freq << " tol: " << tol << std::endl;
+
+    for (auto source : sources)
+    {
+        source->updateClkFreq(freq, tol);
+    }
+}
+
+
+void SourceThread::updateClkEnable(int subProcIdx, bool enable)
 {
     sources[subProcIdx]->updateClk(enable);
 }

@@ -31,6 +31,16 @@ void SourceSim::updateClk(bool enable)
 	clkEnabled = enable;
 }
 
+void SourceSim::updateClkFreq(int freq, float tol)
+{
+	stopTimer();
+
+	clk_period = 1 / (float)freq;
+
+	startTimer(1000 * clk_period / 2);
+
+}
+
 void SourceSim::run()
 {
 
