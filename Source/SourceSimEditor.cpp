@@ -74,6 +74,7 @@ SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceThread* t, 
 	NPX1ClkEnable = new juce::ToggleButton("");
 	NPX1ClkEnable->setBounds(125, 55, 20, 20);
 	NPX1ClkEnable->addListener(this);
+	NPX1ClkEnable->triggerClick();
 	addAndMakeVisible(NPX1ClkEnable);
 
 	NPX2Label = new Label("NPXProbe2", "NPX Probe 2");
@@ -83,6 +84,7 @@ SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceThread* t, 
 	NPX2ClkEnable = new juce::ToggleButton("");
 	NPX2ClkEnable->setBounds(125, 80, 20, 20);
 	NPX2ClkEnable->addListener(this);
+	NPX2ClkEnable->triggerClick();
 	addAndMakeVisible(NPX2ClkEnable);
 
 	NIDAQLabel = new Label("NIDAQ", "NIDAQ");
@@ -92,6 +94,7 @@ SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceThread* t, 
 	NIDAQClkEnable = new juce::ToggleButton("");
 	NIDAQClkEnable->setBounds(125, 105, 20, 20);
 	NIDAQClkEnable->addListener(this);
+	NIDAQClkEnable->triggerClick();
 	addAndMakeVisible(NIDAQClkEnable);
 
 }
