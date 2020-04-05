@@ -2,6 +2,9 @@
 
 SourceSim::SourceSim(String name, int channels, float sampleRate) : Thread(name)
 {
+	risingEdgeProcessed = false;
+	fallingEdgeProcessed = false;
+
 	this->name = name;
 	numChannels = channels;
 	packetSize = 10;
@@ -22,6 +25,16 @@ void SourceSim::timerCallback()
 	if (clkEnabled)
 	{
 		eventCode = (!(bool)eventCode);
+		if (eventCode)
+		{
+			risingEdgeReceived = true;
+			risingEdgeProcessed = false;
+		}
+		else
+		{
+			fallingEdgeReceived = true;
+			fallingEdgeProcessed = false;
+		}
 	}
 
 }
@@ -57,7 +70,20 @@ void SourceSim::run()
 
 		if (time_span.count() > 1 / (sampleRate / packetSize))
 		{
+
+			if (risingEdgeReceived)
+			{
+				lastRisingEdgeSampleNum = numSamples;
+				risingEdgeReceived = false;
+			}
+			else if (fallingEdgeReceived)
+			{
+				lastFallingEdgeSampleNum = numSamples;
+				fallingEdgeReceived = false;
+			}
+
 			generateDataPacket();
+
 			t1 = high_resolution_clock::now();
 		}
 

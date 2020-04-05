@@ -57,7 +57,8 @@ void SourceThread::updateClkFreq(int freq, float tol)
 
     for (auto source : sources)
     {
-        source->updateClkFreq(freq, tol);
+        if (source->isTimerRunning())
+            source->updateClkFreq(freq, tol);
     }
 }
 
@@ -74,7 +75,7 @@ void SourceThread::generateBuffers()
     {
 
         //Add Neuropixels AP Band
-        sources.add(new NPX_AP_BAND());
+        sources.add(new APTrain());
         sourceBuffers.add(new DataBuffer(sources.getLast()->numChannels,1000));
         sources.getLast()->buffer = sourceBuffers.getLast();
 

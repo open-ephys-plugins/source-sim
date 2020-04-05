@@ -36,6 +36,12 @@ public:
 	float clk_tol;
 
 	void timerCallback();
+	bool risingEdgeReceived;
+	bool fallingEdgeReceived;
+	int lastRisingEdgeSampleNum;
+	int lastFallingEdgeSampleNum;
+	bool risingEdgeProcessed;
+	bool fallingEdgeProcessed;
 
 	high_resolution_clock::time_point t1;
 	high_resolution_clock::time_point t2;
@@ -43,6 +49,7 @@ public:
 	void updateClk(bool enable);
 	void updateClkFreq(int freq, float tol);
 
+	/*Add data as a function of processor sample rate + audio card sample rate */ 
 	virtual void generateDataPacket() = 0;
 
 };
@@ -137,7 +144,7 @@ public:
 class APTrain : public SourceSim
 {
 public:
-	APTrain() : SourceSim("APT", 10, 30000) {};
+	APTrain() : SourceSim("APT", 384, 30000.0f) {};
 	~APTrain() {};
 
 	void generateDataPacket() {
@@ -148,27 +155,35 @@ public:
 		for (int i = 0; i < packetSize; i++)
 		{
 
-			int sampleNum = numSamples % (int)sampleRate;
-			float time = 1000.0f * (float)sampleNum / sampleRate;
+			float time = 1000.0f * (float)(numSamples - lastRisingEdgeSampleNum) / sampleRate;
 
-			if (time < DEPOLARIZATION_START_TIME_IN_MS) 
+			if (!risingEdgeProcessed)
 			{
-				sample_out = RESTING_MEMBRANE_POTENTATION_IN_MV + 25.0f * time / (DEPOLARIZATION_START_TIME_IN_MS);
+
+				if (time < DEPOLARIZATION_START_TIME_IN_MS) 
+				{
+					sample_out = RESTING_MEMBRANE_POTENTATION_IN_MV + 25.0f * time / (DEPOLARIZATION_START_TIME_IN_MS);
+				}
+				else if (time < REPOLARIZATION_START_TIME_IN_MS)
+				{
+					time -= DEPOLARIZATION_START_TIME_IN_MS;
+					sample_out = THRESHOLD_POTENTIAL_IN_MV + (PEAK_DEPOLARIZATION_POTENTIAL_IN_MV - THRESHOLD_POTENTIAL_IN_MV) * time / (REPOLARIZATION_START_TIME_IN_MS - DEPOLARIZATION_START_TIME_IN_MS);
+				}
+				else if (time < HYPERPOLARIZATION_START_TIME_IN_MS)
+				{ 
+					time -= REPOLARIZATION_START_TIME_IN_MS;
+					sample_out = PEAK_DEPOLARIZATION_POTENTIAL_IN_MV - (PEAK_DEPOLARIZATION_POTENTIAL_IN_MV - THRESHOLD_POTENTIAL_IN_MV) * time / (HYPERPOLARIZATION_START_TIME_IN_MS - REPOLARIZATION_START_TIME_IN_MS);
+				}
+				else //TODO: Refractory period
+				{
+					risingEdgeProcessed = true;
+				}
 			}
-			else if (time < REPOLARIZATION_START_TIME_IN_MS)
-			{
-				time -= DEPOLARIZATION_START_TIME_IN_MS;
-				sample_out = THRESHOLD_POTENTIAL_IN_MV + (PEAK_DEPOLARIZATION_POTENTIAL_IN_MV - THRESHOLD_POTENTIAL_IN_MV) * time / (REPOLARIZATION_START_TIME_IN_MS - DEPOLARIZATION_START_TIME_IN_MS);
-			}
-			else if (time < HYPERPOLARIZATION_START_TIME_IN_MS)
-			{ 
-				time -= REPOLARIZATION_START_TIME_IN_MS;
-				sample_out = PEAK_DEPOLARIZATION_POTENTIAL_IN_MV - (PEAK_DEPOLARIZATION_POTENTIAL_IN_MV - THRESHOLD_POTENTIAL_IN_MV) * time / (HYPERPOLARIZATION_START_TIME_IN_MS - REPOLARIZATION_START_TIME_IN_MS);
-			}
-			else //TODO: Refractory period
+			else
 			{
 				sample_out = -90.0f;
 			}
+			
 
 			for (int j = 0; j < numChannels; j++)
 			{
