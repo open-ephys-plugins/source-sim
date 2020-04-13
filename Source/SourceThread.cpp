@@ -45,7 +45,6 @@ SourceThread::SourceThread(SourceNode* sn) :
 {
     generateBuffers();
 }
-
 SourceThread::~SourceThread()
 {
 
@@ -140,7 +139,6 @@ bool SourceThread::stopAcquisition()
     return true;
 }
 
-
 bool SourceThread::usesCustomNames() const
 {
 	return true;
@@ -151,7 +149,7 @@ void SourceThread::setDefaultChannelNames()
 
     int absChannel = 0;
 
-    for (int i = 0; i < NUM_PROBES; i+=2)
+    for (int i = 0; i <= NUM_PROBES; i+=2)
     {
 
         //AP
@@ -200,9 +198,7 @@ int SourceThread::getNumDataOutputs(DataChannel::DataChannelTypes type, int subP
 {
 
 	if (type == DataChannel::DataChannelTypes::HEADSTAGE_CHANNEL && subProcessorIdx < 2 * NUM_PROBES)
-    {
-            return sources[subProcessorIdx]->numChannels;
-    }
+        return sources[subProcessorIdx]->numChannels;
 	else if (type == DataChannel::DataChannelTypes::ADC_CHANNEL && subProcessorIdx >= 2 * NUM_PROBES)
 		return sources[subProcessorIdx]->numChannels;
     
