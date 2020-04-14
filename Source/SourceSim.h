@@ -59,7 +59,7 @@ class NPX_AP_BAND : public SourceSim
 {
 
 public:
-	NPX_AP_BAND() : SourceSim("AP", 384, 30000.0f) {};
+	NPX_AP_BAND() : SourceSim("AP", 10, 30000.0f) {};
 	~NPX_AP_BAND() {};
 
 	void generateDataPacket() {
@@ -84,7 +84,7 @@ public:
 class NPX_LFP_BAND : public SourceSim
 {
 public:
-	NPX_LFP_BAND() : SourceSim("LFP", 384, 2500.0f) {};
+	NPX_LFP_BAND() : SourceSim("LFP", 10, 2500.0f) {};
 	~NPX_LFP_BAND() {};
 
 	void generateDataPacket() {
@@ -136,15 +136,15 @@ public:
 #define HYPERPOLARIZATION_START_TIME_IN_MS 1.8f
 #define REFRACTORY_PERIOD_DURAION_IN_MS 5.0f;
 
-#define RESTING_MEMBRANE_POTENTATION_IN_MV -90.0f
-#define THRESHOLD_POTENTIAL_IN_MV -65.0f
-#define PEAK_DEPOLARIZATION_POTENTIAL_IN_MV 35.0f
+#define RESTING_MEMBRANE_POTENTATION_IN_MV 10.0f
+#define THRESHOLD_POTENTIAL_IN_MV -25.0f
+#define PEAK_DEPOLARIZATION_POTENTIAL_IN_MV -100.0f
 
 /* Simulates AP signal based on crude piece-wise function */
 class APTrain : public SourceSim
 {
 public:
-	APTrain() : SourceSim("APT", 384, 30000.0f) {};
+	APTrain() : SourceSim("APT", 10, 30000.0f) {};
 	~APTrain() {};
 
 	void generateDataPacket() {
@@ -162,7 +162,7 @@ public:
 
 				if (time < DEPOLARIZATION_START_TIME_IN_MS) 
 				{
-					sample_out = RESTING_MEMBRANE_POTENTATION_IN_MV + 25.0f * time / (DEPOLARIZATION_START_TIME_IN_MS);
+					sample_out = RESTING_MEMBRANE_POTENTATION_IN_MV + (THRESHOLD_POTENTIAL_IN_MV) * time / (DEPOLARIZATION_START_TIME_IN_MS);
 				}
 				else if (time < REPOLARIZATION_START_TIME_IN_MS)
 				{
@@ -172,7 +172,7 @@ public:
 				else if (time < HYPERPOLARIZATION_START_TIME_IN_MS)
 				{ 
 					time -= REPOLARIZATION_START_TIME_IN_MS;
-					sample_out = PEAK_DEPOLARIZATION_POTENTIAL_IN_MV - (PEAK_DEPOLARIZATION_POTENTIAL_IN_MV - THRESHOLD_POTENTIAL_IN_MV) * time / (HYPERPOLARIZATION_START_TIME_IN_MS - REPOLARIZATION_START_TIME_IN_MS);
+					sample_out = PEAK_DEPOLARIZATION_POTENTIAL_IN_MV + (RESTING_MEMBRANE_POTENTATION_IN_MV - PEAK_DEPOLARIZATION_POTENTIAL_IN_MV) * time / (HYPERPOLARIZATION_START_TIME_IN_MS - REPOLARIZATION_START_TIME_IN_MS);
 				}
 				else //TODO: Refractory period
 				{
@@ -181,7 +181,7 @@ public:
 			}
 			else
 			{
-				sample_out = -90.0f;
+				sample_out = RESTING_MEMBRANE_POTENTATION_IN_MV;
 			}
 			
 
