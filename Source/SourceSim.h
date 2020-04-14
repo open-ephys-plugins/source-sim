@@ -96,7 +96,7 @@ public:
 			for (int j = 0; j < numChannels; j++)
 			{
 				//Generate sine wave at 60 Hz with amplitude 1000
-				samples[j] = 1000.0f*sin(2*PI*(float)numSamples/(sampleRate / 60.0f));
+				samples[j] = (j % 2 == 0 ? 1.0f : -1.0f) * 1000.0f*sin(2*PI*(float)numSamples/(sampleRate / 60.0f));
 			}
 			numSamples++;
 			buffer->addToBuffer(samples, &numSamples, &eventCode, 1);
@@ -140,6 +140,13 @@ public:
 #define THRESHOLD_POTENTIAL_IN_MV -25.0f
 #define PEAK_DEPOLARIZATION_POTENTIAL_IN_MV -100.0f
 
+static unsigned int g_seed;
+
+inline int fastrand() {
+  g_seed = (214013*g_seed+2531011);
+  return (g_seed>>16)&0x7FFF;
+}
+
 /* Simulates AP signal based on crude piece-wise function */
 class APTrain : public SourceSim
 {
@@ -181,7 +188,10 @@ public:
 			}
 			else
 			{
-				sample_out = RESTING_MEMBRANE_POTENTATION_IN_MV;
+				/* TODO: Implement more meaningful simulated resting membrane potential instead of rand() numbers */
+				srand((unsigned) std::time(NULL));
+				float randomNoise = (float) fastrand() / 2147.5;
+				sample_out = RESTING_MEMBRANE_POTENTATION_IN_MV + (randomNoise - 1.0f)*5.0f;
 			}
 			
 
