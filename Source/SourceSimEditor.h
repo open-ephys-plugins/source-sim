@@ -66,16 +66,17 @@ private:
 	ScopedPointer<Label> clockTolLabel;
 	ScopedPointer<NumericEntry> clockTolEntry;
 
-	ScopedPointer<Label> NPX1Label;
-	ScopedPointer<ToggleButton> NPX1ClkEnable;
+	ScopedPointer<Label> deviceLabel;
+	ScopedPointer<Label> channelsLabel;
+	ScopedPointer<Label> quantityLabel;
 
-	ScopedPointer<Label> NPX2Label;
-	ScopedPointer<ToggleButton> NPX2ClkEnable;
+	ScopedPointer<Label> NPXDeviceLabel;
+	ScopedPointer<NumericEntry> NPXChannelsEntry;
+	ScopedPointer<NumericEntry> NPXQuantityEntry;
 
-	ScopedPointer<Label> NIDAQLabel;
-	ScopedPointer<ToggleButton> NIDAQClkEnable;
-
-	ScopedPointer<UtilityButton> addDeviceButton;
+	ScopedPointer<Label> NIDAQDeviceLabel;
+	ScopedPointer<NumericEntry> NIDAQChannelsEntry;
+	ScopedPointer<NumericEntry> NIDAQQuantityEntry;
 
 	Viewport* viewport;
 	SourceSimCanvas* canvas;

@@ -67,35 +67,63 @@ SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceThread* t, 
 	clockTolEntry->addListener(this);
 	addAndMakeVisible(clockTolEntry);
 
-	NPX1Label = new Label("NPXProbe1", "NPX Probe 1");
-	NPX1Label->setBounds(5,55,120,20);
-	addAndMakeVisible(NPX1Label);
+	//Add title labels
+	deviceLabel = new Label("Dev:", "Dev:");
+	deviceLabel->setBounds(5,55,120,20);
+	addAndMakeVisible(deviceLabel);
 
-	NPX1ClkEnable = new juce::ToggleButton("");
-	NPX1ClkEnable->setBounds(125, 55, 20, 20);
-	NPX1ClkEnable->addListener(this);
-	NPX1ClkEnable->triggerClick();
-	addAndMakeVisible(NPX1ClkEnable);
+	channelsLabel = new Label("CH:", "CH:");
+	channelsLabel->setBounds(95,55,30,20);
+	addAndMakeVisible(channelsLabel);
 
-	NPX2Label = new Label("NPXProbe2", "NPX Probe 2");
-	NPX2Label->setBounds(5,80,120,20);
-	addAndMakeVisible(NPX2Label);
+	quantityLabel = new Label("QTY:", "QTY:");
+	quantityLabel->setBounds(130,55,40,20);
+	addAndMakeVisible(quantityLabel);
 
-	NPX2ClkEnable = new juce::ToggleButton("");
-	NPX2ClkEnable->setBounds(125, 80, 20, 20);
-	NPX2ClkEnable->addListener(this);
-	NPX2ClkEnable->triggerClick();
-	addAndMakeVisible(NPX2ClkEnable);
+	NPXDeviceLabel = new Label("NPX1 Probe", "NPX1 Probe");
+	NPXDeviceLabel->setBounds(5,80,120,20);
+	addAndMakeVisible(NPXDeviceLabel);
 
-	NIDAQLabel = new Label("NIDAQ", "NIDAQ");
-	NIDAQLabel->setBounds(5,105,120,20);
-	addAndMakeVisible(NIDAQLabel);
+	NPXChannelsEntry = new NumericEntry("NPXChannelsEntry", "0");
+	NPXChannelsEntry->setBounds(95,80,40,20);
+	NPXChannelsEntry->setEditable(false, true);
+	NPXChannelsEntry->setColour(Label::backgroundColourId, Colours::grey);
+	NPXChannelsEntry->setColour(Label::backgroundWhenEditingColourId, Colours::white);
+	NPXChannelsEntry->setJustificationType(Justification::centredRight);
+	NPXChannelsEntry->addListener(this);
+	addAndMakeVisible(NPXChannelsEntry);
 
-	NIDAQClkEnable = new juce::ToggleButton("");
-	NIDAQClkEnable->setBounds(125, 105, 20, 20);
-	NIDAQClkEnable->addListener(this);
-	NIDAQClkEnable->triggerClick();
-	addAndMakeVisible(NIDAQClkEnable);
+	NPXQuantityEntry = new NumericEntry("NPXQuantityEntry", "0");
+	NPXQuantityEntry->setBounds(137,80,30,20);
+	NPXQuantityEntry->setEditable(false, true);
+	NPXQuantityEntry->setColour(Label::backgroundColourId, Colours::grey);
+	NPXQuantityEntry->setColour(Label::backgroundWhenEditingColourId, Colours::white);
+	NPXQuantityEntry->setJustificationType(Justification::centredRight);
+	NPXQuantityEntry->addListener(this);
+	addAndMakeVisible(NPXQuantityEntry);
+
+	NIDAQDeviceLabel = new Label("NIDAQ", "NIDAQ-Sim");
+	NIDAQDeviceLabel->setBounds(5,105,120,20);
+	addAndMakeVisible(NIDAQDeviceLabel);
+
+	NIDAQChannelsEntry = new NumericEntry("NIDAQChannelsEntry", "0");
+	NIDAQChannelsEntry->setBounds(95,105,40,20);
+	NIDAQChannelsEntry->setEditable(false, true);
+	NIDAQChannelsEntry->setColour(Label::backgroundColourId, Colours::grey);
+	NIDAQChannelsEntry->setColour(Label::backgroundWhenEditingColourId, Colours::white);
+	NIDAQChannelsEntry->setJustificationType(Justification::centredRight);
+	NIDAQChannelsEntry->addListener(this);
+	addAndMakeVisible(NIDAQChannelsEntry);
+
+	NIDAQQuantityEntry = new NumericEntry("NIDAQQuantityEntry", "0");
+	NIDAQQuantityEntry->setBounds(137,105,30,20);
+	NIDAQQuantityEntry->setEditable(false, true);
+	NIDAQQuantityEntry->setColour(Label::backgroundColourId, Colours::grey);
+	NIDAQQuantityEntry->setColour(Label::backgroundWhenEditingColourId, Colours::white);
+	NIDAQQuantityEntry->setJustificationType(Justification::centredRight);
+	NIDAQQuantityEntry->addListener(this);
+	addAndMakeVisible(NIDAQQuantityEntry);
+
 
 }
 
@@ -144,21 +172,7 @@ void SourceSimEditor::comboBoxChanged(ComboBox* comboBox)
 void SourceSimEditor::buttonEvent(Button* button)
 {
 
-	int subProcIdx;
-	if (button == (Button*)NPX1ClkEnable)
-	{
-		thread->updateClkEnable(0, button->getToggleState());
-		thread->updateClkEnable(1, button->getToggleState());
-	}
-	else if (button == (Button*)NPX2ClkEnable)
-	{
-		thread->updateClkEnable(2, button->getToggleState());
-		thread->updateClkEnable(3, button->getToggleState());
-	}
-	if (button == (Button*)NIDAQClkEnable)
-	{
-		thread->updateClkEnable(4, button->getToggleState());
-	}
+
 
 }
 
