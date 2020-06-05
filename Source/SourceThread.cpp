@@ -25,7 +25,7 @@
 #include "SourceSimEditor.h"
 #include <cmath>
 
-#define NUM_PROBES 2
+#define NUM_PROBES 4
 
 DataThread* SourceThread::createDataThread(SourceNode *sn)
 {
@@ -74,7 +74,7 @@ void SourceThread::generateBuffers()
     {
 
         //Add Neuropixels AP Band
-        sources.add(new APTrain());
+        sources.add(new NPX_AP_BAND());
         sourceBuffers.add(new DataBuffer(sources.getLast()->numChannels,1000));
         sources.getLast()->buffer = sourceBuffers.getLast();
 
@@ -209,7 +209,7 @@ int SourceThread::getNumDataOutputs(DataChannel::DataChannelTypes type, int subP
 /** Returns the number of TTL channels that each subprocessor generates*/
 int SourceThread::getNumTTLOutputs(int subProcessorIdx) const 
 {
-    if (subProcessorIdx < 4)
+    if (subProcessorIdx < 2 * NUM_PROBES)
 	    return 1;
     else 
         return 8;

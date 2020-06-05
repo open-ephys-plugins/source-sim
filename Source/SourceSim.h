@@ -9,6 +9,11 @@
 
 #define PI 3.14159f
 
+#define AP_CHANNELS 384
+#define LFP_CHANNELS 384
+#define NIDAQ_CHANNELS 8
+#define APT_CHANNELS 384
+
 using namespace std::chrono;
 
 /* Source Simulator Class to simulate actual sources generating data into OpenEphys */
@@ -59,19 +64,21 @@ class NPX_AP_BAND : public SourceSim
 {
 
 public:
-	NPX_AP_BAND() : SourceSim("AP", 10, 30000.0f) {};
+	NPX_AP_BAND() : SourceSim("AP", AP_CHANNELS, 30000.0f) {};
 	~NPX_AP_BAND() {};
 
 	void generateDataPacket() {
 
-		float samples[numChannels];
+		float samples[AP_CHANNELS];
 
 		for (int i = 0; i < packetSize; i++)
 		{
+
+			//Generate sine wave at 60 Hz with amplitude 1000
+			float sample =  1000.0f*sin(2*PI*(float)numSamples/(sampleRate / 60.0f));
 			for (int j = 0; j < numChannels; j++)
 			{
-				//Generate sine wave at 60 Hz with amplitude 1000
-				samples[j] = 1000.0f*sin(2*PI*(float)numSamples/(sampleRate / 60.0f));
+				samples[j] = sample;
 			}
 			numSamples++;
 			buffer->addToBuffer(samples, &numSamples, &eventCode, 1);
@@ -84,12 +91,12 @@ public:
 class NPX_LFP_BAND : public SourceSim
 {
 public:
-	NPX_LFP_BAND() : SourceSim("LFP", 10, 2500.0f) {};
+	NPX_LFP_BAND() : SourceSim("LFP", LFP_CHANNELS, 2500.0f) {};
 	~NPX_LFP_BAND() {};
 
 	void generateDataPacket() {
 
-		float samples[numChannels];
+		float samples[LFP_CHANNELS];
 
 		for (int i = 0; i < packetSize; i++)
 		{
@@ -109,12 +116,12 @@ public:
 class NIDAQ : public SourceSim
 {
 public:
-	NIDAQ() : SourceSim("AI", 8, 30000.0f) {};
+	NIDAQ() : SourceSim("AI", NIDAQ_CHANNELS, 30000.0f) {};
 	~NIDAQ() {};
 
 	void generateDataPacket() {
 
-		float samples[numChannels];
+		float samples[NIDAQ_CHANNELS];
 
 		for (int i = 0; i < packetSize; i++)
 		{
@@ -151,12 +158,12 @@ inline int fastrand() {
 class APTrain : public SourceSim
 {
 public:
-	APTrain() : SourceSim("APT", 10, 30000.0f) {};
+	APTrain() : SourceSim("APT", APT_CHANNELS, 30000.0f) {};
 	~APTrain() {};
 
 	void generateDataPacket() {
 
-		float samples[numChannels];
+		float samples[APT_CHANNELS];
 		float sample_out;
 
 		for (int i = 0; i < packetSize; i++)
@@ -189,9 +196,12 @@ public:
 			else
 			{
 				/* TODO: Implement more meaningful simulated resting membrane potential instead of rand() numbers */
+				/*
 				srand((unsigned) std::time(NULL));
 				float randomNoise = (float) fastrand() / 2147.5;
 				sample_out = RESTING_MEMBRANE_POTENTATION_IN_MV + (randomNoise - 1.0f)*5.0f;
+				*/
+				sample_out = 0;
 			}
 			
 
