@@ -11,7 +11,7 @@
 
 #define AP_CHANNELS 384
 #define LFP_CHANNELS 384
-#define NIDAQ_CHANNELS 8
+#define NIDAQ_CHANNELS 1
 #define APT_CHANNELS 384
 
 using namespace std::chrono;

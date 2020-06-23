@@ -25,7 +25,7 @@
 #include "SourceSimEditor.h"
 #include <cmath>
 
-#define NUM_PROBES 4
+#define NUM_PROBES 6
 
 DataThread* SourceThread::createDataThread(SourceNode *sn)
 {
@@ -74,7 +74,7 @@ void SourceThread::generateBuffers()
     {
 
         //Add Neuropixels AP Band
-        sources.add(new NPX_AP_BAND());
+        sources.add(new APTrain());
         sourceBuffers.add(new DataBuffer(sources.getLast()->numChannels,1000));
         sources.getLast()->buffer = sourceBuffers.getLast();
 
@@ -89,6 +89,7 @@ void SourceThread::generateBuffers()
     sources.add(new NIDAQ());
     sourceBuffers.add(new DataBuffer(sources.getLast()->numChannels,1000));
     sources.getLast()->buffer = sourceBuffers.getLast();
+
 }
 
 bool SourceThread::foundInputSource()
@@ -149,7 +150,7 @@ void SourceThread::setDefaultChannelNames()
 
     int absChannel = 0;
 
-    for (int i = 0; i <= NUM_PROBES; i+=2)
+    for (int i = 0; i < 2*NUM_PROBES; i+=2)
     {
 
         //AP
@@ -181,6 +182,7 @@ void SourceThread::setDefaultChannelNames()
         info.name = "AI" + String(i + 1);
         info.gain = 1.0f;
         channelInfo.set(absChannel, info);
+        std::cout << "Setting channel " << absChannel << std::endl;
         absChannel++;
     }
 
