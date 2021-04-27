@@ -64,11 +64,19 @@ public:
 	SourceThread(SourceNode* sn);
 	~SourceThread();
 
+	int numProbes;
+	int numChannelsPerProbe;
+	int numNIDevices;
+	int numChannelsPerNIDAQDevice;
+
 	void generateBuffers();
 
 	bool updateBuffer();
 
-	void updateChannels();
+	void updateNPXChannels(int channels);
+	void updateNumProbes(int probes);
+	void updateNIDAQChannels(int channels);
+	void updateNIDAQDeviceCount(int count);
 
 	/** Returns true if the data source is connected, false otherwise.*/
 	bool foundInputSource();

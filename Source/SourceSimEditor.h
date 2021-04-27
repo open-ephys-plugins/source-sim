@@ -46,6 +46,9 @@ public:
 	SourceSimEditor(GenericProcessor* parentNode, SourceThread* thread, bool useDefaultParameterEditors);
 	virtual ~SourceSimEditor();
 
+	void startAcquisition() override;
+	void stopAcquisition() override;
+
 	void collapsedStateChanged() override;
 
 	void comboBoxChanged(ComboBox*);

@@ -51,6 +51,7 @@ SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceThread* t, 
 	clockFreqEntry->setColour(Label::backgroundColourId, Colours::grey);
 	clockFreqEntry->setColour(Label::backgroundWhenEditingColourId, Colours::white);
 	clockFreqEntry->setJustificationType(Justification::centredRight);
+	clockFreqEntry->setText("1", juce::NotificationType::sendNotification);
 	clockFreqEntry->addListener(this);
 	addAndMakeVisible(clockFreqEntry);
 
@@ -64,6 +65,8 @@ SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceThread* t, 
 	clockTolEntry->setColour(Label::backgroundColourId, Colours::grey);
 	clockTolEntry->setColour(Label::backgroundWhenEditingColourId, Colours::white);
 	clockTolEntry->setJustificationType(Justification::centredRight);
+	clockTolEntry->setText("0", juce::NotificationType::sendNotification);
+	clockTolEntry->setEnabled(false);
 	clockTolEntry->addListener(this);
 	addAndMakeVisible(clockTolEntry);
 
@@ -90,6 +93,7 @@ SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceThread* t, 
 	NPXChannelsEntry->setColour(Label::backgroundColourId, Colours::grey);
 	NPXChannelsEntry->setColour(Label::backgroundWhenEditingColourId, Colours::white);
 	NPXChannelsEntry->setJustificationType(Justification::centredRight);
+	NPXChannelsEntry->setText(String(t->numChannelsPerProbe), juce::NotificationType::sendNotification);
 	NPXChannelsEntry->addListener(this);
 	addAndMakeVisible(NPXChannelsEntry);
 
@@ -99,6 +103,7 @@ SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceThread* t, 
 	NPXQuantityEntry->setColour(Label::backgroundColourId, Colours::grey);
 	NPXQuantityEntry->setColour(Label::backgroundWhenEditingColourId, Colours::white);
 	NPXQuantityEntry->setJustificationType(Justification::centredRight);
+	NPXQuantityEntry->setText(String(t->numProbes), juce::NotificationType::sendNotification);
 	NPXQuantityEntry->addListener(this);
 	addAndMakeVisible(NPXQuantityEntry);
 
@@ -112,6 +117,7 @@ SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceThread* t, 
 	NIDAQChannelsEntry->setColour(Label::backgroundColourId, Colours::grey);
 	NIDAQChannelsEntry->setColour(Label::backgroundWhenEditingColourId, Colours::white);
 	NIDAQChannelsEntry->setJustificationType(Justification::centredRight);
+	NIDAQChannelsEntry->setText(String(t->numChannelsPerNIDAQDevice), juce::NotificationType::sendNotification);
 	NIDAQChannelsEntry->addListener(this);
 	addAndMakeVisible(NIDAQChannelsEntry);
 
@@ -121,6 +127,7 @@ SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceThread* t, 
 	NIDAQQuantityEntry->setColour(Label::backgroundColourId, Colours::grey);
 	NIDAQQuantityEntry->setColour(Label::backgroundWhenEditingColourId, Colours::white);
 	NIDAQQuantityEntry->setJustificationType(Justification::centredRight);
+	NIDAQQuantityEntry->setText(String(t->numNIDevices), juce::NotificationType::sendNotification);
 	NIDAQQuantityEntry->addListener(this);
 	addAndMakeVisible(NIDAQQuantityEntry);
 
@@ -134,6 +141,8 @@ SourceSimEditor::~SourceSimEditor()
 
 void SourceSimEditor::labelTextChanged (Label* label)
 {
+
+	std::cout << "Detected label change" << std::endl;
 
 	int freq = clockFreqEntry->getText().getIntValue();
 	float tol = clockTolEntry->getText().getFloatValue();
@@ -152,8 +161,66 @@ void SourceSimEditor::labelTextChanged (Label* label)
 			tol = 0;
 		}
 	}
+	else if (label == NPXChannelsEntry)
+	{
+		int channels = NPXChannelsEntry->getText().getIntValue();
+		if (channels < 0 || channels > 384)
+		{
+		    channels = 384;
+            NPXChannelsEntry->setText(String(channels), juce::NotificationType::sendNotification);
+		}
+        thread->updateNPXChannels(channels);
+	}
+	else if (label == NPXQuantityEntry)
+	{
+		int numProbes = NPXQuantityEntry->getText().getIntValue();
+		if (numProbes < 0 || numProbes > 10)
+		{
+		    numProbes = 1;
+            NPXQuantityEntry->setText(String(numProbes), juce::NotificationType::sendNotification);
+		}
+		thread->updateNumProbes(numProbes);
+	}
+	else if (label == NIDAQChannelsEntry)
+	{
+		int channels = NIDAQChannelsEntry->getText().getIntValue();
+		if (channels < 0 || channels > 32)
+		{
+		    channels = 8;
+            NIDAQChannelsEntry->setText(String(channels), juce::NotificationType::sendNotification);
+		}
+		thread->updateNIDAQChannels(channels);
+	}
+	else if (label == NIDAQQuantityEntry)
+	{
+		int numDevices = NIDAQQuantityEntry->getText().getIntValue();
+		if (numDevices < 0 || numDevices > 2)
+		{
+		    numDevices = 1;
+            NIDAQQuantityEntry->setText(String(numDevices), juce::NotificationType::sendNotification);
+		}
+		thread->updateNIDAQDeviceCount(numDevices);
+	}
+
 	thread->updateClkFreq(freq, tol);
+    CoreServices::updateSignalChain(this);	
 	
+}
+
+void SourceSimEditor::startAcquisition()
+{
+	NPXChannelsEntry->setEnabled(false);
+	NPXQuantityEntry->setEnabled(false);
+	NIDAQChannelsEntry->setEnabled(false);
+	NIDAQQuantityEntry->setEnabled(false);
+}
+
+void SourceSimEditor::stopAcquisition()
+{
+	NPXChannelsEntry->setEnabled(true);
+	NPXQuantityEntry->setEnabled(true);
+	NIDAQChannelsEntry->setEnabled(true);
+	NIDAQQuantityEntry->setEnabled(true);
 }
 
 void SourceSimEditor::collapsedStateChanged()

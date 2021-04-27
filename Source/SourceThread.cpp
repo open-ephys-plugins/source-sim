@@ -26,6 +26,11 @@
 #include <cmath>
 
 #define NUM_PROBES 6
+#define NUM_NI_DEVICES 1
+#define AP_CHANNELS 384
+#define LFP_CHANNELS 384
+#define APT_CHANNELS 384
+#define NIDAQ_CHANNELS 8
 
 DataThread* SourceThread::createDataThread(SourceNode *sn)
 {
@@ -41,10 +46,15 @@ GenericEditor* SourceThread::createEditor(SourceNode* sn)
 
 SourceThread::SourceThread(SourceNode* sn) : 
 	DataThread(sn),
-	recordingTimer(this)
+	recordingTimer(this),
+    numProbes(NUM_PROBES),
+    numChannelsPerProbe(AP_CHANNELS),
+	numNIDevices(NUM_NI_DEVICES),
+	numChannelsPerNIDAQDevice(NIDAQ_CHANNELS)
 {
     generateBuffers();
 }
+
 SourceThread::~SourceThread()
 {
 
@@ -67,28 +77,62 @@ void SourceThread::updateClkEnable(int subProcIdx, bool enable)
     sources[subProcIdx]->updateClk(enable);
 }
 
+void SourceThread::updateNPXChannels(int channels)
+{
+    numChannelsPerProbe = channels;
+    generateBuffers();
+    sn->update();
+}
+
+void SourceThread::updateNumProbes(int probes)
+{
+    numProbes = probes;
+    generateBuffers();
+    sn->update();
+}
+	
+void SourceThread::updateNIDAQChannels(int channels)
+{
+    numChannelsPerNIDAQDevice = channels;
+    generateBuffers();
+    sn->update();
+}
+
+void SourceThread::updateNIDAQDeviceCount(int count)
+{
+    numNIDevices = count; 
+    generateBuffers();
+    sn->update();
+}
+
 void SourceThread::generateBuffers()
 {
 
-    for (int i = 0; i < NUM_PROBES; i++)
+    sources.clear();
+    sourceBuffers.clear();
+
+    for (int i = 0; i < numProbes; i++)
     {
 
         //Add Neuropixels AP Band
-        sources.add(new APTrain());
+        sources.add(new NPX_AP_BAND(numChannelsPerProbe));
         sourceBuffers.add(new DataBuffer(sources.getLast()->numChannels,1000));
         sources.getLast()->buffer = sourceBuffers.getLast();
 
         //Add Neuropixels LFP Band
-        sources.add(new NPX_LFP_BAND());
+        sources.add(new NPX_LFP_BAND(numChannelsPerProbe));
         sourceBuffers.add(new DataBuffer(sources.getLast()->numChannels,1000));
         sources.getLast()->buffer = sourceBuffers.getLast();
 
     }
 
     // //Add NIDAQ Band
-    sources.add(new NIDAQ());
-    sourceBuffers.add(new DataBuffer(sources.getLast()->numChannels,1000));
-    sources.getLast()->buffer = sourceBuffers.getLast();
+    for (int i = 0; i < numNIDevices; i++)
+    {
+        sources.add(new NIDAQ(numChannelsPerNIDAQDevice));
+        sourceBuffers.add(new DataBuffer(sources.getLast()->numChannels,1000));
+        sources.getLast()->buffer = sourceBuffers.getLast();
+    }	
 
 }
 
@@ -150,7 +194,7 @@ void SourceThread::setDefaultChannelNames()
 
     int absChannel = 0;
 
-    for (int i = 0; i < 2*NUM_PROBES; i+=2)
+    for (int i = 0; i < 2*numProbes; i+=2)
     {
 
         //AP
@@ -175,15 +219,19 @@ void SourceThread::setDefaultChannelNames()
 
     }
 
-    // //NIDAQ
-    for (int i = 0; i < sources[sources.size()-1]->numChannels; i++)
+    //NIDAQ
+    for (int i = 0; i < numNIDevices; i++)
     {
-        ChannelCustomInfo info;
-        info.name = "AI" + String(i + 1);
-        info.gain = 1.0f;
-        channelInfo.set(absChannel, info);
-        std::cout << "Setting channel " << absChannel << std::endl;
-        absChannel++;
+
+        for (int i = 0; i < sources[sources.size()-1]->numChannels; i++)
+        {
+            ChannelCustomInfo info;
+            info.name = "AI" + String(i + 1);
+            info.gain = 1.0f;
+            channelInfo.set(absChannel, info);
+            absChannel++;
+        }
+
     }
 
 }
@@ -199,9 +247,9 @@ unsigned int SourceThread::getNumSubProcessors() const
 int SourceThread::getNumDataOutputs(DataChannel::DataChannelTypes type, int subProcessorIdx) const
 {
 
-	if (type == DataChannel::DataChannelTypes::HEADSTAGE_CHANNEL && subProcessorIdx < 2 * NUM_PROBES)
+	if (type == DataChannel::DataChannelTypes::HEADSTAGE_CHANNEL && subProcessorIdx < 2 * numProbes)
         return sources[subProcessorIdx]->numChannels;
-	else if (type == DataChannel::DataChannelTypes::ADC_CHANNEL && subProcessorIdx >= 2 * NUM_PROBES)
+	else if (type == DataChannel::DataChannelTypes::ADC_CHANNEL && subProcessorIdx >= 2 * numProbes)
 		return sources[subProcessorIdx]->numChannels;
     
     return 0;
@@ -211,10 +259,10 @@ int SourceThread::getNumDataOutputs(DataChannel::DataChannelTypes type, int subP
 /** Returns the number of TTL channels that each subprocessor generates*/
 int SourceThread::getNumTTLOutputs(int subProcessorIdx) const 
 {
-    if (subProcessorIdx < 2 * NUM_PROBES)
+    if (subProcessorIdx < 2 * numProbes)
 	    return 1;
     else 
-        return 8;
+        return numChannelsPerNIDAQDevice;
 }
 
 /** Returns the sample rate of the data source.*/

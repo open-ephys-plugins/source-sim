@@ -9,11 +9,6 @@
 
 #define PI 3.14159f
 
-#define AP_CHANNELS 384
-#define LFP_CHANNELS 384
-#define NIDAQ_CHANNELS 1
-#define APT_CHANNELS 384
-
 using namespace std::chrono;
 
 /* Source Simulator Class to simulate actual sources generating data into OpenEphys */
@@ -64,24 +59,24 @@ class NPX_AP_BAND : public SourceSim
 {
 
 public:
-	NPX_AP_BAND() : SourceSim("AP", AP_CHANNELS, 30000.0f) {};
+	NPX_AP_BAND(int nChannels) : SourceSim("AP", nChannels, 30000.0f) {};
 	~NPX_AP_BAND() {};
 
 	void generateDataPacket() {
 
-		float samples[AP_CHANNELS];
+		std::vector<float> samples;
 
 		for (int i = 0; i < packetSize; i++)
 		{
 
 			//Generate sine wave at 60 Hz with amplitude 1000
-			float sample =  1000.0f*sin(2*PI*(float)numSamples/(sampleRate / 60.0f));
 			for (int j = 0; j < numChannels; j++)
 			{
-				samples[j] = sample;
+				samples.push_back(1000.0f*sin(2*PI*(float)numSamples/(sampleRate / 60.0f)));
 			}
 			numSamples++;
-			buffer->addToBuffer(samples, &numSamples, &eventCode, 1);
+			buffer->addToBuffer(&samples[0], &numSamples, &eventCode, 1);
+			samples.clear();
 		}
 
 	};
@@ -91,22 +86,23 @@ public:
 class NPX_LFP_BAND : public SourceSim
 {
 public:
-	NPX_LFP_BAND() : SourceSim("LFP", LFP_CHANNELS, 2500.0f) {};
+	NPX_LFP_BAND(int nChannels) : SourceSim("LFP", nChannels, 2500.0f) {};
 	~NPX_LFP_BAND() {};
 
 	void generateDataPacket() {
 
-		float samples[LFP_CHANNELS];
+		std::vector<float> samples;
 
 		for (int i = 0; i < packetSize; i++)
 		{
 			for (int j = 0; j < numChannels; j++)
 			{
 				//Generate sine wave at 60 Hz with amplitude 1000
-				samples[j] = (j % 2 == 0 ? 1.0f : -1.0f) * 1000.0f*sin(2*PI*(float)numSamples/(sampleRate / 60.0f));
+				samples.push_back((j % 2 == 0 ? 1.0f : -1.0f) * 1000.0f*sin(2*PI*(float)numSamples/(sampleRate / 60.0f)));
 			}
 			numSamples++;
-			buffer->addToBuffer(samples, &numSamples, &eventCode, 1);
+			buffer->addToBuffer(&samples[0], &numSamples, &eventCode, 1);
+			samples.clear();
 		}
 
 	};
@@ -116,22 +112,23 @@ public:
 class NIDAQ : public SourceSim
 {
 public:
-	NIDAQ() : SourceSim("AI", NIDAQ_CHANNELS, 30000.0f) {};
+	NIDAQ(int nChannels) : SourceSim("AI", nChannels, 30000.0f) {};
 	~NIDAQ() {};
 
 	void generateDataPacket() {
 
-		float samples[NIDAQ_CHANNELS];
+		std::vector<float> samples;
 
 		for (int i = 0; i < packetSize; i++)
 		{
 			for (int j = 0; j < numChannels; j++)
 			{
 				//Generate sine wave at 10 Hz with amplitude 1000
-				samples[j] = 1000.0f*sin(2*PI*(float)numSamples/(sampleRate / 10.0f));
+				samples.push_back(1000.0f*sin(2*PI*(float)numSamples/(sampleRate / 10.0f)));
 			}
 			numSamples++;
-			buffer->addToBuffer(samples, &numSamples, &eventCode, 1);
+			buffer->addToBuffer(&samples[0], &numSamples, &eventCode, 1);
+			samples.clear();
 		}
 
 	};
@@ -158,12 +155,12 @@ inline int fastrand() {
 class APTrain : public SourceSim
 {
 public:
-	APTrain() : SourceSim("APT", APT_CHANNELS, 30000.0f) {};
+	APTrain(int nChannels) : SourceSim("APT", nChannels, 30000.0f) {};
 	~APTrain() {};
 
 	void generateDataPacket() {
 
-		float samples[APT_CHANNELS];
+		std::vector<float> samples;
 		float sample_out;
 
 		for (int i = 0; i < packetSize; i++)
@@ -207,10 +204,12 @@ public:
 
 			for (int j = 0; j < numChannels; j++)
 			{
-				samples[j] = sample_out;
+				samples.push_back(sample_out);
 			}
 			numSamples++;
-			buffer->addToBuffer(samples, &numSamples, &eventCode, 1);
+			buffer->addToBuffer(&samples[0], &numSamples, &eventCode, 1);
+			samples.clear();
+
 		}
 
 	};
