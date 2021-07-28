@@ -38,9 +38,9 @@ DataThread* SourceThread::createDataThread(SourceNode *sn)
 }
 
 
-GenericEditor* SourceThread::createEditor(SourceNode* sn)
+std::unique_ptr<GenericEditor> SourceThread::createEditor(SourceNode* sn)
 {
-    return new SourceSimEditor(sn, this, true);
+    return std::make_unique<SourceSimEditor>(sn, this, true);
 }
 
 

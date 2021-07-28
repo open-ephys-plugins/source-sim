@@ -8,6 +8,7 @@
 #include <chrono>
 
 #define PI 3.14159f
+#define MAX_NUM_SAMPLES 5400000
 
 using namespace std::chrono;
 
@@ -72,7 +73,7 @@ public:
 			//Generate sine wave at 60 Hz with amplitude 1000
 			for (int j = 0; j < numChannels; j++)
 			{
-				samples.push_back(1000.0f*sin(2*PI*(float)numSamples/(sampleRate / 60.0f)));
+				samples.push_back(1000.0f*( (float(MAX_NUM_SAMPLES - numSamples)) / MAX_NUM_SAMPLES)*sin(2*PI*(float)numSamples/(sampleRate / 60.0f)));
 			}
 			numSamples++;
 			buffer->addToBuffer(&samples[0], &numSamples, &eventCode, 1);

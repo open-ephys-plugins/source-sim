@@ -161,7 +161,7 @@ public:
 
 	static DataThread* createDataThread(SourceNode* sn);
 
-	GenericEditor* createEditor(SourceNode* sn);
+	std::unique_ptr<GenericEditor> createEditor(SourceNode* sn);
 
 	OwnedArray<SourceSim> sources;
 

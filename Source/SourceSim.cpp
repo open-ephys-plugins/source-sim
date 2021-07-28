@@ -66,7 +66,8 @@ void SourceSim::run()
 
 	t1 = high_resolution_clock::now();
 
-	int count = 0;
+	int count = 1;
+	int checkpoint = 1000000;
 
 	while (!threadShouldExit())
 	{
@@ -94,6 +95,13 @@ void SourceSim::run()
 
 		//Reset the sampling check time
 		t1 = high_resolution_clock::now();
+
+		if (numSamples > checkpoint) 
+		{
+			count += 1; 
+			updateClkFreq(count, 0.0f);
+			checkpoint += 1000000;
+		}
 
 	}
 
