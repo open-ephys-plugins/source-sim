@@ -96,27 +96,12 @@ public:
 	bool stopAcquisition() override;
 
 	// DataThread Methods
-
-	/** Returns the number of virtual subprocessors this source can generate */
-	unsigned int getNumSubProcessors() const override;
-
-	/** Returns the number of continuous headstage channels the data source can provide.*/
-	int getNumDataOutputs(DataChannel::DataChannelTypes type, int subProcessorIdx) const override;
-
-	/** Returns the number of TTL channels that each subprocessor generates*/
-	int getNumTTLOutputs(int subProcessorIdx) const override;
-
-	/** Returns the sample rate of the data source.*/
-	float getSampleRate(int subProcessorIdx) const override;
-
-	/** Returns the volts per bit of the data source.*/
-	float getBitVolts(const DataChannel* chan) const override;
-
-	/** Used to set default channel names.*/
-	void setDefaultChannelNames() override;
-
-	/** Used to override default channel names.*/
-	bool usesCustomNames() const override;
+	void updateSettings(OwnedArray<ContinuousChannel>* continuousChannels,
+		OwnedArray<EventChannel>* eventChannels,
+		OwnedArray<SpikeChannel>* spikeChannels,
+		OwnedArray<DataStream>* sourceStreams,
+		OwnedArray<DeviceInfo>* devices,
+		OwnedArray<ConfigurationObject>* configurationObjects);
 
 	/** Selects which electrode is connected to each channel. */
 	void selectElectrodes(unsigned char slot, signed char port, Array<int> channelStatus);

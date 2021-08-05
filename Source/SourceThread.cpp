@@ -60,6 +60,16 @@ SourceThread::~SourceThread()
 
 }
 
+void SourceThread::updateSettings(OwnedArray<ContinuousChannel>* continuousChannels,
+		OwnedArray<EventChannel>* eventChannels,
+		OwnedArray<SpikeChannel>* spikeChannels,
+		OwnedArray<DataStream>* sourceStreams,
+		OwnedArray<DeviceInfo>* devices,
+		OwnedArray<ConfigurationObject>* configurationObjects)
+{
+    //TODO
+}
+
 void SourceThread::updateClkFreq(int freq, float tol)
 {
     std::cout << "Update clk freq: " << freq << " tol: " << tol << std::endl;
@@ -184,106 +194,10 @@ bool SourceThread::stopAcquisition()
     return true;
 }
 
-bool SourceThread::usesCustomNames() const
-{
-	return true;
-}
-
-void SourceThread::setDefaultChannelNames()
-{
-
-    int absChannel = 0;
-
-    for (int i = 0; i < 2*numProbes; i+=2)
-    {
-
-        //AP
-        for (int j = 0; j < sources[i]->numChannels; j++)
-        {
-            ChannelCustomInfo info;
-            info.name = "AP" + String(j + 1);
-            info.gain = 1.0f;
-            channelInfo.set(absChannel, info);
-            absChannel++;
-        }
-
-        //LFP
-        for (int j = 0; j < sources[i+1]->numChannels; j++)
-        {
-            ChannelCustomInfo info;
-            info.name = "LFP" + String(j + 1);
-            info.gain = 1.0f;
-            channelInfo.set(absChannel, info);
-            absChannel++;
-        }
-
-    }
-
-    //NIDAQ
-    for (int i = 0; i < numNIDevices; i++)
-    {
-
-        for (int i = 0; i < sources[sources.size()-1]->numChannels; i++)
-        {
-            ChannelCustomInfo info;
-            info.name = "AI" + String(i + 1);
-            info.gain = 1.0f;
-            channelInfo.set(absChannel, info);
-            absChannel++;
-        }
-
-    }
-
-}
-
-
-/** Returns the number of virtual subprocessors this source can generate */
-unsigned int SourceThread::getNumSubProcessors() const
-{
-	return sources.size();
-}
-
-/** Returns the number of continuous headstage channels the data source can provide.*/
-int SourceThread::getNumDataOutputs(DataChannel::DataChannelTypes type, int subProcessorIdx) const
-{
-
-	if (type == DataChannel::DataChannelTypes::HEADSTAGE_CHANNEL && subProcessorIdx < 2 * numProbes)
-        return sources[subProcessorIdx]->numChannels;
-	else if (type == DataChannel::DataChannelTypes::ADC_CHANNEL && subProcessorIdx >= 2 * numProbes)
-		return sources[subProcessorIdx]->numChannels;
-    
-    return 0;
-
-}
-
-/** Returns the number of TTL channels that each subprocessor generates*/
-int SourceThread::getNumTTLOutputs(int subProcessorIdx) const 
-{
-    if (subProcessorIdx < 2 * numProbes)
-	    return 1;
-    else 
-        return numChannelsPerNIDAQDevice;
-}
-
-/** Returns the sample rate of the data source.*/
-float SourceThread::getSampleRate(int subProcessorIdx) const
-{
-
-    return sources[subProcessorIdx]->sampleRate;
-    
-}
-
-/** Returns the volts per bit of the data source.*/
-float SourceThread::getBitVolts(const DataChannel* chan) const
-{
-	return 1.0f;
-}
-
 bool SourceThread::updateBuffer()
 {
     return true;
 }
-
 
 RecordingTimer::RecordingTimer(SourceThread* t_)
 {
