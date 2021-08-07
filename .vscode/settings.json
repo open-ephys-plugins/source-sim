@@ -46,6 +46,10 @@
         "stdexcept": "cpp",
         "streambuf": "cpp",
         "cinttypes": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "*.mm": "cpp",
+        "datathreadheaders.h": "c",
+        "sourcenode.h": "c",
+        "genericprocessor.h": "c"
     }
 }

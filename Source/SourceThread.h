@@ -69,8 +69,6 @@ public:
 	int numNIDevices;
 	int numChannelsPerNIDAQDevice;
 
-	void generateBuffers();
-
 	bool updateBuffer();
 
 	void updateNPXChannels(int channels);

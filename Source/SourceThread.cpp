@@ -52,7 +52,6 @@ SourceThread::SourceThread(SourceNode* sn) :
 	numNIDevices(NUM_NI_DEVICES),
 	numChannelsPerNIDAQDevice(NIDAQ_CHANNELS)
 {
-    generateBuffers();
 }
 
 SourceThread::~SourceThread()
@@ -67,7 +66,159 @@ void SourceThread::updateSettings(OwnedArray<ContinuousChannel>* continuousChann
 		OwnedArray<DeviceInfo>* devices,
 		OwnedArray<ConfigurationObject>* configurationObjects)
 {
-    //TODO
+
+    continuousChannels->clear();
+    eventChannels->clear();
+    spikeChannels->clear();
+    sourceStreams->clear();
+    devices->clear();
+    configurationObjects->clear();
+
+    for (int i = 0; i < numProbes; i++)
+    {
+
+
+
+        //Add Neuropixels AP Band Stream
+        DataStream::Settings apSettings {
+            "Probe " + String(i) + " AP band",
+            "Neural data sampled @30kHz ",
+            "SP" + String(i) + "_AP",
+            30000.0f
+        };
+
+        sourceStreams->add(new DataStream(apSettings));
+
+        sources.add(new NPX_AP_BAND(numChannelsPerProbe));
+        sourceBuffers.add(new DataBuffer(numChannelsPerProbe, 1000));
+        sources.getLast()->buffer = sourceBuffers.getLast();
+
+        for (int j = 0; j < numChannelsPerProbe; j++)
+        {
+
+            ContinuousChannel::Settings channelSettings
+            {
+                ContinuousChannel::Type::ELECTRODE,
+                "CH" + String(j + 1),
+                "AP voltage from electrode " + String(j+1),
+                "source",
+                0.195f, // BITVOLTS VALUE
+                sourceStreams->getLast()
+            };
+            continuousChannels->add(new ContinuousChannel(channelSettings));
+        }
+
+		EventChannel *apSyncLine;
+
+        EventChannel::Settings apSyncSettings {
+            EventChannel::Type::TTL,
+            "AP Sync Line",
+            "Synchronization signal from the AP band of simulated probe " + String(i),
+            "probe.sync",
+            sourceStreams->getLast()
+        };
+
+        apSyncLine = new EventChannel(apSyncSettings);
+		apSyncLine->setIdentifier("Probe" + String(i) + "AP sync line");
+		eventChannels->add(apSyncLine);
+
+
+
+
+        //Add a Neuropixels LFP Band Stream
+        DataStream::Settings lfpSettings {
+            "Probe " + String(i) + " LFP band",
+            "Neural data sampled @2.5kHz ",
+            "SP" + String(i) + "_LFP",
+            2500.0f
+        };
+
+        sourceStreams->add(new DataStream(lfpSettings));
+
+        sources.add(new NPX_LFP_BAND(numChannelsPerProbe));
+        sourceBuffers.add(new DataBuffer(numChannelsPerProbe, 1000));
+        sources.getLast()->buffer = sourceBuffers.getLast();
+
+        for (int j = 0; j < numChannelsPerProbe; j++)
+        {
+
+            ContinuousChannel::Settings channelSettings
+            {
+                ContinuousChannel::Type::ELECTRODE,
+                "CH" + String(j + 1),
+                "LFP voltage from electrode " + String(j+1),
+                "source",
+                0.195f, // BITVOLTS VALUE
+                sourceStreams->getLast()
+            };
+            continuousChannels->add(new ContinuousChannel(channelSettings));
+        }
+
+
+        EventChannel *lfpSyncLine;
+
+        EventChannel::Settings lfpSyncSettings {
+            EventChannel::Type::TTL,
+            "LFP Sync Line",
+            "Synchronization signal from the LFP band of simulated probe " + String(i),
+            "probe.sync",
+            sourceStreams->getLast()
+        };
+
+        lfpSyncLine = new EventChannel(lfpSyncSettings);
+        lfpSyncLine->setIdentifier("Probe" + String(i) + "LFP sync line");
+        eventChannels->add(lfpSyncLine);
+
+    }
+
+    for (int i = 0; i < numNIDevices; i++)
+    {
+
+        //Add a NIDAQ stream
+        DataStream::Settings nidaqSettings {
+            "NIDAQ Device",
+            "Neural data sampled @2.5kHz ",
+            "P" + String(i) + "_LFP",
+            2500.0f
+        };
+
+        sourceStreams->add(new DataStream(nidaqSettings));
+
+        sources.add(new NIDAQ(numChannelsPerProbe));
+        sourceBuffers.add(new DataBuffer(numChannelsPerNIDAQDevice, 1000));
+        sources.getLast()->buffer = sourceBuffers.getLast();
+
+        for (int j = 0; j < numChannelsPerNIDAQDevice; j++)
+        {
+
+            ContinuousChannel::Settings settings
+            {
+                ContinuousChannel::Type::ADC,
+                "CH" + String(j + 1),
+                "Analog voltage from input " + String(j+1),
+                "source",
+                0.195f, // BITVOLTS VALUE
+                sourceStreams->getLast()
+            };
+            continuousChannels->add(new ContinuousChannel(settings));
+        }
+
+        EventChannel *nidaqDigitalLine;
+
+        EventChannel::Settings eventSettings {
+            EventChannel::Type::TTL,
+            "NIDAQ Digital Line",
+            "NIDAQ digital line events from device " + String(i),
+            "nidaq.digital",
+            sourceStreams->getLast()
+        };
+
+        nidaqDigitalLine = new EventChannel(eventSettings);
+        nidaqDigitalLine->setIdentifier("NIDAQ device" + String(i) + "digital line");
+        eventChannels->add(nidaqDigitalLine);
+
+    }
+
 }
 
 void SourceThread::updateClkFreq(int freq, float tol)
@@ -90,61 +241,27 @@ void SourceThread::updateClkEnable(int subProcIdx, bool enable)
 void SourceThread::updateNPXChannels(int channels)
 {
     numChannelsPerProbe = channels;
-    generateBuffers();
     sn->update();
 }
 
 void SourceThread::updateNumProbes(int probes)
 {
     numProbes = probes;
-    generateBuffers();
     sn->update();
 }
 	
 void SourceThread::updateNIDAQChannels(int channels)
 {
     numChannelsPerNIDAQDevice = channels;
-    generateBuffers();
     sn->update();
 }
 
 void SourceThread::updateNIDAQDeviceCount(int count)
 {
     numNIDevices = count; 
-    generateBuffers();
     sn->update();
 }
 
-void SourceThread::generateBuffers()
-{
-
-    sources.clear();
-    sourceBuffers.clear();
-
-    for (int i = 0; i < numProbes; i++)
-    {
-
-        //Add Neuropixels AP Band
-        sources.add(new NPX_AP_BAND(numChannelsPerProbe));
-        sourceBuffers.add(new DataBuffer(sources.getLast()->numChannels,1000));
-        sources.getLast()->buffer = sourceBuffers.getLast();
-
-        //Add Neuropixels LFP Band
-        sources.add(new NPX_LFP_BAND(numChannelsPerProbe));
-        sourceBuffers.add(new DataBuffer(sources.getLast()->numChannels,1000));
-        sources.getLast()->buffer = sourceBuffers.getLast();
-
-    }
-
-    // //Add NIDAQ Band
-    for (int i = 0; i < numNIDevices; i++)
-    {
-        sources.add(new NIDAQ(numChannelsPerNIDAQDevice));
-        sourceBuffers.add(new DataBuffer(sources.getLast()->numChannels,1000));
-        sources.getLast()->buffer = sourceBuffers.getLast();
-    }	
-
-}
 
 bool SourceThread::foundInputSource()
 {
