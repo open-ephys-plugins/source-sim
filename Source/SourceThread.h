@@ -88,10 +88,10 @@ public:
 	void openConnection();
 
 	/** Initializes data transfer.*/
-	bool startAcquisition() override;
+	bool startAcquisition();
 
 	/** Stops data transfer.*/
-	bool stopAcquisition() override;
+	bool stopAcquisition();
 
 	// DataThread Methods
 	void updateSettings(OwnedArray<ContinuousChannel>* continuousChannels,
@@ -158,6 +158,8 @@ private:
 	CriticalSection displayMutex;
 
 	RecordingTimer recordingTimer;
+
+	bool settingsUpdated;
 
 };
 

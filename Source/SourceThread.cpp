@@ -25,11 +25,11 @@
 #include "SourceSimEditor.h"
 #include <cmath>
 
-#define NUM_PROBES 6
+#define NUM_PROBES 1
 #define NUM_NI_DEVICES 1
-#define AP_CHANNELS 384
-#define LFP_CHANNELS 384
-#define APT_CHANNELS 384
+#define AP_CHANNELS 16
+#define LFP_CHANNELS 16
+#define APT_CHANNELS 16
 #define NIDAQ_CHANNELS 8
 
 DataThread* SourceThread::createDataThread(SourceNode *sn)
@@ -50,7 +50,8 @@ SourceThread::SourceThread(SourceNode* sn) :
     numProbes(NUM_PROBES),
     numChannelsPerProbe(AP_CHANNELS),
 	numNIDevices(NUM_NI_DEVICES),
-	numChannelsPerNIDAQDevice(NIDAQ_CHANNELS)
+	numChannelsPerNIDAQDevice(NIDAQ_CHANNELS),
+    settingsUpdated(false)
 {
 }
 
@@ -67,16 +68,8 @@ void SourceThread::updateSettings(OwnedArray<ContinuousChannel>* continuousChann
 		OwnedArray<ConfigurationObject>* configurationObjects)
 {
 
-    continuousChannels->clear();
-    eventChannels->clear();
-    spikeChannels->clear();
-    sourceStreams->clear();
-    devices->clear();
-    configurationObjects->clear();
-
     for (int i = 0; i < numProbes; i++)
     {
-
 
 
         //Add Neuropixels AP Band Stream
@@ -108,7 +101,7 @@ void SourceThread::updateSettings(OwnedArray<ContinuousChannel>* continuousChann
             continuousChannels->add(new ContinuousChannel(channelSettings));
         }
 
-		EventChannel *apSyncLine;
+        EventChannel *apSyncLine;
 
         EventChannel::Settings apSyncSettings {
             EventChannel::Type::TTL,
@@ -119,8 +112,8 @@ void SourceThread::updateSettings(OwnedArray<ContinuousChannel>* continuousChann
         };
 
         apSyncLine = new EventChannel(apSyncSettings);
-		apSyncLine->setIdentifier("Probe" + String(i) + "AP sync line");
-		eventChannels->add(apSyncLine);
+        apSyncLine->setIdentifier("Probe" + String(i) + "AP sync line");
+        eventChannels->add(apSyncLine);
 
 
 
@@ -137,6 +130,7 @@ void SourceThread::updateSettings(OwnedArray<ContinuousChannel>* continuousChann
 
         sources.add(new NPX_LFP_BAND(numChannelsPerProbe));
         sourceBuffers.add(new DataBuffer(numChannelsPerProbe, 1000));
+        std::cout << "[SS] Adding input buffer " << sourceBuffers.size() << " at address " << sourceBuffers.getLast() << std::endl;
         sources.getLast()->buffer = sourceBuffers.getLast();
 
         for (int j = 0; j < numChannelsPerProbe; j++)
@@ -186,6 +180,7 @@ void SourceThread::updateSettings(OwnedArray<ContinuousChannel>* continuousChann
 
         sources.add(new NIDAQ(numChannelsPerProbe));
         sourceBuffers.add(new DataBuffer(numChannelsPerNIDAQDevice, 1000));
+        std::cout << "[SS] Adding input buffer " << sourceBuffers.size() << " at address " << sourceBuffers.getLast() << std::endl;
         sources.getLast()->buffer = sourceBuffers.getLast();
 
         for (int j = 0; j < numChannelsPerNIDAQDevice; j++)
@@ -218,6 +213,8 @@ void SourceThread::updateSettings(OwnedArray<ContinuousChannel>* continuousChann
         eventChannels->add(nidaqDigitalLine);
 
     }
+
+    std::cout << "Total event channels: " << eventChannels->size() << std::endl;
 
 }
 
@@ -271,7 +268,7 @@ bool SourceThread::foundInputSource()
 bool SourceThread::startAcquisition()
 {
 
-	sourceBuffers.getLast()->clear();
+	//sourceBuffers.getLast()->clear();
 
     for (int i = 0; i < sources.size(); i++)
     {
