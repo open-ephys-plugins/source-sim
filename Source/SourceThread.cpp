@@ -112,7 +112,8 @@ void SourceThread::updateSettings(OwnedArray<ContinuousChannel>* continuousChann
         };
 
         apSyncLine = new EventChannel(apSyncSettings);
-        apSyncLine->setIdentifier("Probe" + String(i) + "AP sync line");
+        String id = "Probe" + String(i) + "AP sync line";
+        apSyncLine->setIdentifier(id);
         eventChannels->add(apSyncLine);
 
 
@@ -160,7 +161,8 @@ void SourceThread::updateSettings(OwnedArray<ContinuousChannel>* continuousChann
         };
 
         lfpSyncLine = new EventChannel(lfpSyncSettings);
-        lfpSyncLine->setIdentifier("Probe" + String(i) + "LFP sync line");
+        id = "Probe" + String(i) + "LFP sync line";
+        lfpSyncLine->setIdentifier(id);
         eventChannels->add(lfpSyncLine);
 
     }
@@ -209,7 +211,8 @@ void SourceThread::updateSettings(OwnedArray<ContinuousChannel>* continuousChann
         };
 
         nidaqDigitalLine = new EventChannel(eventSettings);
-        nidaqDigitalLine->setIdentifier("NIDAQ device" + String(i) + "digital line");
+        String id = "NIDAQ device" + std::to_string(i) + "digital line";
+        nidaqDigitalLine->setIdentifier(id);
         eventChannels->add(nidaqDigitalLine);
 
     }
