@@ -155,6 +155,8 @@ public:
 
 private:
 
+	OwnedArray<DataStream> sourceStreams;
+
 	CriticalSection displayMutex;
 
 	RecordingTimer recordingTimer;

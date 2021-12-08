@@ -46,7 +46,7 @@ extern "C" EXPORT void getLibInfo(Plugin::LibraryInfo* info)
 	info->name = "Source Simulator";
 
 	//Version of the library, used only for information
-	info->libVersion = 1;
+	info->libVersion = "0.1.0";
 	info->numPlugins = NUM_PLUGINS;
 }
 
@@ -56,7 +56,7 @@ extern "C" EXPORT int getPluginInfo(int index, Plugin::PluginInfo* info)
 	{
 		//one case per plugin. This example is for a processor which connects directly to the signal chain
 	case 0:
-		info->type = Plugin::PLUGIN_TYPE_DATA_THREAD;
+		info->type = Plugin::DATA_THREAD;
 		info->dataThread.name = "Source Sim";
 		info->dataThread.creator = &createDataThread<SourceThread>;
 		break;

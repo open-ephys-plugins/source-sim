@@ -76,7 +76,7 @@ public:
 				samples.push_back(1000.0f*( (float(MAX_NUM_SAMPLES - numSamples)) / MAX_NUM_SAMPLES)*sin(2*PI*(float)numSamples/(sampleRate / 60.0f)));
 			}
 			numSamples++;
-			buffer->addToBuffer(&samples[0], &numSamples, &eventCode, 1);
+			//buffer->addToBuffer(&samples[0], &numSamples, &eventCode, 1);
 			samples.clear();
 		}
 
@@ -102,7 +102,7 @@ public:
 				samples.push_back((j % 2 == 0 ? 1.0f : -1.0f) * 1000.0f*sin(2*PI*(float)numSamples/(sampleRate / 60.0f)));
 			}
 			numSamples++;
-			buffer->addToBuffer(&samples[0], &numSamples, &eventCode, 1);
+			//buffer->addToBuffer(&samples[0], &numSamples, &eventCode, 1);
 			samples.clear();
 		}
 
@@ -128,7 +128,7 @@ public:
 				samples.push_back(1000.0f*sin(2*PI*(float)numSamples/(sampleRate / 10.0f)));
 			}
 			numSamples++;
-			buffer->addToBuffer(&samples[0], &numSamples, &eventCode, 1);
+			//buffer->addToBuffer(&samples[0], &numSamples, &eventCode, 1);
 			samples.clear();
 		}
 
@@ -208,7 +208,7 @@ public:
 				samples.push_back(sample_out);
 			}
 			numSamples++;
-			buffer->addToBuffer(&samples[0], &numSamples, &eventCode, 1);
+			//buffer->addToBuffer(&samples[0], &numSamples, &eventCode, 1);
 			samples.clear();
 
 		}

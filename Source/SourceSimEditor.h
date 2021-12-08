@@ -40,10 +40,13 @@ public:
 	virtual TextEditor* createEditorComponent() override;
 };
 
-class SourceSimEditor : public VisualizerEditor, public ComboBox::Listener, public Label::Listener
+class SourceSimEditor : public VisualizerEditor, 
+						public ComboBox::Listener, 
+						public Label::Listener,
+					    public Button::Listener
 {
 public:
-	SourceSimEditor(GenericProcessor* parentNode, SourceThread* thread, bool useDefaultParameterEditors);
+	SourceSimEditor(GenericProcessor* parentNode, SourceThread* thread);
 	virtual ~SourceSimEditor();
 
 	void startAcquisition() override;
@@ -53,10 +56,10 @@ public:
 
 	void comboBoxChanged(ComboBox*);
 	void labelTextChanged (Label*);
-	void buttonEvent(Button*) override;
+	void buttonClicked(Button*) override;
 
-	void saveEditorParameters(XmlElement*);
-	void loadEditorParameters(XmlElement*);
+	void saveVisualizerEditorParameters(XmlElement*) override;
+	void loadVisualizerEditorParameters(XmlElement*) override;
 
 	Visualizer* createNewCanvas(void);
 
@@ -109,8 +112,8 @@ public:
 	void setParameter(int, int, int, float);
 	void buttonClicked(Button* button);;
 
-	void saveVisualizerParameters(XmlElement* xml);
-	void loadVisualizerParameters(XmlElement* xml);
+	void saveCustomParametersToXml(XmlElement* xml) override;
+	void loadCustomParametersFromXml(XmlElement* xml) override;
 
 	void resized();
 

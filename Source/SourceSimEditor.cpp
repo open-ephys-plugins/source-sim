@@ -32,8 +32,8 @@ TextEditor* NumericEntry::createEditorComponent()
 }
 
 
-SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceThread* t, bool useDefaultParameterEditors)
- : VisualizerEditor(parentNode, useDefaultParameterEditors)
+SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceThread* t)
+ : VisualizerEditor(parentNode)
 {
 
     thread = t;
@@ -236,7 +236,7 @@ void SourceSimEditor::comboBoxChanged(ComboBox* comboBox)
 
 
 
-void SourceSimEditor::buttonEvent(Button* button)
+void SourceSimEditor::buttonClicked(Button* button)
 {
 
 
@@ -244,44 +244,34 @@ void SourceSimEditor::buttonEvent(Button* button)
 }
 
 
-void SourceSimEditor::saveEditorParameters(XmlElement* xml)
+void SourceSimEditor::saveVisualizerEditorParameters(XmlElement* xml)
 {
-    /*
-	std::cout << "Saving Neuropix editor." << std::endl;
 
-	XmlElement* xmlNode = xml->createNewChildElement("NEUROPIXELS_EDITOR");
+	XmlElement* xmlNode = xml->createNewChildElement("SOURCE_SIM_EDITOR");
 
-	for (int slot = 0; slot < thread->getNumBasestations(); slot++)
-	{
-		String directory_name = savingDirectories[slot].getFullPathName();
-		if (directory_name.length() == 2)
-			directory_name += "\\\\";
-		xmlNode->setAttribute("Slot" + String(slot) + "Directory", directory_name);
-	}
-    */
+	xmlNode->setAttribute("npx_channels", NPXChannelsEntry->getText());
+	xmlNode->setAttribute("npx_quantity", NPXQuantityEntry->getText());
+	xmlNode->setAttribute("nidaq_channels", NIDAQChannelsEntry->getText());
+	xmlNode->setAttribute("nidaq_quantity", NIDAQQuantityEntry->getText());
 
 }
 
-void SourceSimEditor::loadEditorParameters(XmlElement* xml)
+void SourceSimEditor::loadVisualizerEditorParameters(XmlElement* xml)
 {
-    /*
+    
 	forEachXmlChildElement(*xml, xmlNode)
 	{
-		if (xmlNode->hasTagName("NEUROPIXELS_EDITOR"))
+		if (xmlNode->hasTagName("SOURCE_SIM_EDITOR"))
 		{
-			std::cout << "Found parameters for Neuropixels editor" << std::endl;
+			std::cout << "Found parameters for Source Sim editor" << std::endl;
 
-			for (int slot = 0; slot < thread->getNumBasestations(); slot++)
-			{
-				File directory = File(xmlNode->getStringAttribute("Slot" + String(slot) + "Directory"));
-				std::cout << "Setting thread directory for slot " << slot << std::endl;
-				thread->setDirectoryForSlot(slot, directory);
-				directoryButtons[slot]->setLabel(directory.getFullPathName().substring(0, 2));
-				savingDirectories.set(slot, directory);
-			}
+			NPXChannelsEntry->setText(xmlNode->getStringAttribute("npx_channels", "16"), sendNotification);
+			NPXQuantityEntry->setText(xmlNode->getStringAttribute("npx_quantity", "1"), sendNotification);
+			NIDAQChannelsEntry->setText(xmlNode->getStringAttribute("nidaq_channels", "8"), sendNotification);
+			NIDAQQuantityEntry->setText(xmlNode->getStringAttribute("nidaq_quantity", "1"), sendNotification);
 		}
 	}
-    */
+    
 }
 
 
@@ -399,17 +389,15 @@ void SourceSimCanvas::buttonClicked(Button* button)
 }
 
 
-void SourceSimCanvas::saveVisualizerParameters(XmlElement* xml)
+void SourceSimCanvas::saveCustomParametersToXml(XmlElement* xml)
 {
-	editor->saveEditorParameters(xml);
 
 	for (int i = 0; i < sourceSimInterfaces.size(); i++)
 		sourceSimInterfaces[i]->saveParameters(xml);
 }
 
-void SourceSimCanvas::loadVisualizerParameters(XmlElement* xml)
+void SourceSimCanvas::loadCustomParametersFromXml(XmlElement* xml)
 {
-	editor->loadEditorParameters(xml);
 
 	for (int i = 0; i < sourceSimInterfaces.size(); i++)
 		sourceSimInterfaces[i]->loadParameters(xml);
