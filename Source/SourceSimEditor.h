@@ -24,45 +24,61 @@
 #ifndef __SOURCESIMEDITOR_H__
 #define __SOURCESIMEDITOR_H__
 
-#include <VisualizerEditorHeaders.h>
+#include <EditorHeaders.h>
 
-class UtilityButton;
-class SourceNode;
+#include "SourceSimThread.h"
 
-class SourceSimCanvas;
-class SourceSimInterface;
-
+/** 
+	An editable label that only accepts numbers
+*/
 class NumericEntry : public Label
 {
 public:
+
+	/** Constructor */
 	NumericEntry(String name, String text) : Label(name, text) {};
+
+	/** Destructor */
 	~NumericEntry() {};
+
+	/** Creates the editor component */
 	virtual TextEditor* createEditorComponent() override;
 };
 
-class SourceSimEditor : public VisualizerEditor, 
-						public ComboBox::Listener, 
-						public Label::Listener,
-					    public Button::Listener
+/** 
+
+	Used to change the number of data streams, and the
+	number of channels per stream.
+
+*/
+class SourceSimEditor : public GenericEditor, 
+						public Label::Listener
 {
 public:
-	SourceSimEditor(GenericProcessor* parentNode, SourceThread* thread);
+
+	/** Constructor */
+	SourceSimEditor(GenericProcessor* parentNode, SourceSimThread* thread);
+
+	/** Destructor */
 	virtual ~SourceSimEditor();
 
+	/** Disables label editing */
 	void startAcquisition() override;
+
+	/** Enables label editing */
 	void stopAcquisition() override;
 
-	void collapsedStateChanged() override;
-
-	void comboBoxChanged(ComboBox*);
+	/** Respond to label changes */
 	void labelTextChanged (Label*);
-	void buttonClicked(Button*) override;
 
-	void saveVisualizerEditorParameters(XmlElement*) override;
-	void loadVisualizerEditorParameters(XmlElement*) override;
+	/** Saves editor parameters */
+	void saveCustomParametersToXml(XmlElement*) override;
 
-	Visualizer* createNewCanvas(void);
+	/** Loads editor parameters*/
+	void loadCustomParametersFromXml(XmlElement*) override;
 
+	/** Returns the current settings*/
+	void getSettings(PluginSettingsObject& settings);
 
 private:
 
@@ -84,87 +100,9 @@ private:
 	ScopedPointer<NumericEntry> NIDAQChannelsEntry;
 	ScopedPointer<NumericEntry> NIDAQQuantityEntry;
 
-	Viewport* viewport;
-	SourceSimCanvas* canvas;
-	SourceThread* thread;
+	SourceSimThread* thread;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SourceSimEditor);
-
-};
-
-class SourceSimCanvas : public Visualizer, public Button::Listener
-{
-public:
-	SourceSimCanvas(GenericProcessor* p, SourceSimEditor*, SourceThread*);
-	~SourceSimCanvas();
-
-	void paint(Graphics& g);
-
-	void refresh();
-
-	void beginAnimation();
-	void endAnimation();
-
-	void refreshState();
-	void update();
-
-	void setParameter(int, float);
-	void setParameter(int, int, int, float);
-	void buttonClicked(Button* button);;
-
-	void saveCustomParametersToXml(XmlElement* xml) override;
-	void loadCustomParametersFromXml(XmlElement* xml) override;
-
-	void resized();
-
-	SourceNode* processor;
-	ScopedPointer<Viewport> sourceSimViewport;
-	OwnedArray<SourceSimInterface> sourceSimInterfaces;
-
-	int option;
-
-	SourceSimEditor* editor;
-
-};
-
-class SourceSimInterface : public Component, public Button::Listener, public ComboBox::Listener, public Label::Listener, public Timer
-{
-public:
-	SourceSimInterface(XmlElement info_, int id, SourceThread*, SourceSimEditor*);
-	~SourceSimInterface();
-
-	void paint(Graphics& g);
-
-	void updateInfoString();
-
-	void mouseMove(const MouseEvent& event);
-	void mouseDown(const MouseEvent& event);
-	void mouseDrag(const MouseEvent& event);
-	void mouseUp(const MouseEvent& event);
-	void mouseWheelMove(const MouseEvent&  event, const MouseWheelDetails&   wheel) ;
-	MouseCursor getMouseCursor();
-
-	void buttonClicked(Button*);
-	void comboBoxChanged(ComboBox*);
-
-	void saveParameters(XmlElement* xml);
-	void loadParameters(XmlElement* xml);
-
-	void timerCallback();
-
-	int id;
-
-private:
-	
-	SourceThread* thread;
-	SourceSimEditor* editor;
-	DataBuffer* inputBuffer;
-	AudioSampleBuffer displayBuffer;
-
-	
-	XmlElement source_sim_info;
-
-	MouseCursor::StandardCursorType cursorType;
 
 };
 

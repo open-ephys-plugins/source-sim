@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <PluginInfo.h>
-#include "SourceThread.h"
+#include "SourceSimThread.h"
 #include <string>
 
 #ifdef WIN32
@@ -58,7 +58,7 @@ extern "C" EXPORT int getPluginInfo(int index, Plugin::PluginInfo* info)
 	case 0:
 		info->type = Plugin::DATA_THREAD;
 		info->dataThread.name = "Source Sim";
-		info->dataThread.creator = &createDataThread<SourceThread>;
+		info->dataThread.creator = &createDataThread<SourceSimThread>;
 		break;
 
 	default:

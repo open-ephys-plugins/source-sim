@@ -21,7 +21,6 @@
 
 */
 
-#include "SourceThread.h"
 #include "SourceSimEditor.h"
 
 TextEditor* NumericEntry::createEditorComponent()
@@ -32,14 +31,12 @@ TextEditor* NumericEntry::createEditorComponent()
 }
 
 
-SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceThread* t)
- : VisualizerEditor(parentNode)
+SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceSimThread* t)
+	: GenericEditor(parentNode)
 {
 
+	desiredWidth = 250;
     thread = t;
-    canvas = nullptr;
-
-    tabText = "Source Sim";
 
 	clockFreqLabel = new Label("clkFreqLabel", "CLK (Hz)");
 	clockFreqLabel->setBounds(5,30,50,20);
@@ -93,7 +90,7 @@ SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceThread* t)
 	NPXChannelsEntry->setColour(Label::backgroundColourId, Colours::grey);
 	NPXChannelsEntry->setColour(Label::backgroundWhenEditingColourId, Colours::white);
 	NPXChannelsEntry->setJustificationType(Justification::centredRight);
-	NPXChannelsEntry->setText(String(t->numChannelsPerProbe), juce::NotificationType::sendNotification);
+	NPXChannelsEntry->setText(String(384), juce::NotificationType::sendNotification);
 	NPXChannelsEntry->addListener(this);
 	addAndMakeVisible(NPXChannelsEntry);
 
@@ -103,7 +100,7 @@ SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceThread* t)
 	NPXQuantityEntry->setColour(Label::backgroundColourId, Colours::grey);
 	NPXQuantityEntry->setColour(Label::backgroundWhenEditingColourId, Colours::white);
 	NPXQuantityEntry->setJustificationType(Justification::centredRight);
-	NPXQuantityEntry->setText(String(t->numProbes), juce::NotificationType::sendNotification);
+	NPXQuantityEntry->setText(String(1), juce::NotificationType::sendNotification);
 	NPXQuantityEntry->addListener(this);
 	addAndMakeVisible(NPXQuantityEntry);
 
@@ -117,7 +114,7 @@ SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceThread* t)
 	NIDAQChannelsEntry->setColour(Label::backgroundColourId, Colours::grey);
 	NIDAQChannelsEntry->setColour(Label::backgroundWhenEditingColourId, Colours::white);
 	NIDAQChannelsEntry->setJustificationType(Justification::centredRight);
-	NIDAQChannelsEntry->setText(String(t->numChannelsPerNIDAQDevice), juce::NotificationType::sendNotification);
+	NIDAQChannelsEntry->setText(String(16), juce::NotificationType::sendNotification);
 	NIDAQChannelsEntry->addListener(this);
 	addAndMakeVisible(NIDAQChannelsEntry);
 
@@ -127,7 +124,7 @@ SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceThread* t)
 	NIDAQQuantityEntry->setColour(Label::backgroundColourId, Colours::grey);
 	NIDAQQuantityEntry->setColour(Label::backgroundWhenEditingColourId, Colours::white);
 	NIDAQQuantityEntry->setJustificationType(Justification::centredRight);
-	NIDAQQuantityEntry->setText(String(t->numNIDevices), juce::NotificationType::sendNotification);
+	NIDAQQuantityEntry->setText(String(1), juce::NotificationType::sendNotification);
 	NIDAQQuantityEntry->addListener(this);
 	addAndMakeVisible(NIDAQQuantityEntry);
 
@@ -151,6 +148,9 @@ void SourceSimEditor::labelTextChanged (Label* label)
 	{
 		/* Restrict to integer values only */
 		label->setText(String(freq),juce::NotificationType::sendNotification);
+
+		thread->updateClkFreq(freq, tol);
+		return;
 	}
 	else if (label == clockTolEntry)
 	{
@@ -160,26 +160,31 @@ void SourceSimEditor::labelTextChanged (Label* label)
 			label->setText("0", juce::NotificationType::sendNotification);
 			tol = 0;
 		}
+
+		thread->updateClkFreq(freq, tol);
+		return;
 	}
-	else if (label == NPXChannelsEntry)
+	
+	if (label == NPXChannelsEntry)
 	{
 		int channels = NPXChannelsEntry->getText().getIntValue();
+		
 		if (channels < 0 || channels > 384)
 		{
 		    channels = 384;
             NPXChannelsEntry->setText(String(channels), juce::NotificationType::sendNotification);
 		}
-        thread->updateNPXChannels(channels);
 	}
 	else if (label == NPXQuantityEntry)
 	{
 		int numProbes = NPXQuantityEntry->getText().getIntValue();
-		if (numProbes < 0 || numProbes > 10)
+
+		if (numProbes < 0 || numProbes > 20)
 		{
 		    numProbes = 1;
             NPXQuantityEntry->setText(String(numProbes), juce::NotificationType::sendNotification);
 		}
-		thread->updateNumProbes(numProbes);
+
 	}
 	else if (label == NIDAQChannelsEntry)
 	{
@@ -189,22 +194,29 @@ void SourceSimEditor::labelTextChanged (Label* label)
 		    channels = 8;
             NIDAQChannelsEntry->setText(String(channels), juce::NotificationType::sendNotification);
 		}
-		thread->updateNIDAQChannels(channels);
+
 	}
 	else if (label == NIDAQQuantityEntry)
 	{
 		int numDevices = NIDAQQuantityEntry->getText().getIntValue();
-		if (numDevices < 0 || numDevices > 2)
+		if (numDevices < 0 || numDevices > 20)
 		{
 		    numDevices = 1;
             NIDAQQuantityEntry->setText(String(numDevices), juce::NotificationType::sendNotification);
 		}
-		thread->updateNIDAQDeviceCount(numDevices);
-	}
 
-	thread->updateClkFreq(freq, tol);
+	}
+	
     CoreServices::updateSignalChain(this);	
 	
+}
+
+void SourceSimEditor::getSettings(PluginSettingsObject& settings)
+{
+	settings.numProbes = NPXQuantityEntry->getText().getIntValue();
+	settings.channelsPerProbe = NPXChannelsEntry->getText().getIntValue();
+	settings.numNIDAQ = NIDAQQuantityEntry->getText().getIntValue();
+	settings.channelsPerNIDAQ = NIDAQChannelsEntry->getText().getIntValue();
 }
 
 void SourceSimEditor::startAcquisition()
@@ -223,303 +235,23 @@ void SourceSimEditor::stopAcquisition()
 	NIDAQQuantityEntry->setEnabled(true);
 }
 
-void SourceSimEditor::collapsedStateChanged()
+
+void SourceSimEditor::saveCustomParametersToXml(XmlElement* xml)
 {
+
+	xml->setAttribute("npx_channels", NPXChannelsEntry->getText());
+	xml->setAttribute("npx_quantity", NPXQuantityEntry->getText());
+	xml->setAttribute("nidaq_channels", NIDAQChannelsEntry->getText());
+	xml->setAttribute("nidaq_quantity", NIDAQQuantityEntry->getText());
 
 }
 
-void SourceSimEditor::comboBoxChanged(ComboBox* comboBox)
-{
-
-
-}
-
-
-
-void SourceSimEditor::buttonClicked(Button* button)
-{
-
-
-
-}
-
-
-void SourceSimEditor::saveVisualizerEditorParameters(XmlElement* xml)
-{
-
-	XmlElement* xmlNode = xml->createNewChildElement("SOURCE_SIM_EDITOR");
-
-	xmlNode->setAttribute("npx_channels", NPXChannelsEntry->getText());
-	xmlNode->setAttribute("npx_quantity", NPXQuantityEntry->getText());
-	xmlNode->setAttribute("nidaq_channels", NIDAQChannelsEntry->getText());
-	xmlNode->setAttribute("nidaq_quantity", NIDAQQuantityEntry->getText());
-
-}
-
-void SourceSimEditor::loadVisualizerEditorParameters(XmlElement* xml)
+void SourceSimEditor::loadCustomParametersFromXml(XmlElement* xml)
 {
     
-	forEachXmlChildElement(*xml, xmlNode)
-	{
-		if (xmlNode->hasTagName("SOURCE_SIM_EDITOR"))
-		{
-			std::cout << "Found parameters for Source Sim editor" << std::endl;
-
-			NPXChannelsEntry->setText(xmlNode->getStringAttribute("npx_channels", "16"), sendNotification);
-			NPXQuantityEntry->setText(xmlNode->getStringAttribute("npx_quantity", "1"), sendNotification);
-			NIDAQChannelsEntry->setText(xmlNode->getStringAttribute("nidaq_channels", "8"), sendNotification);
-			NIDAQQuantityEntry->setText(xmlNode->getStringAttribute("nidaq_quantity", "1"), sendNotification);
-		}
-	}
+	NPXChannelsEntry->setText(xml->getStringAttribute("npx_channels", "384"), dontSendNotification);
+	NPXQuantityEntry->setText(xml->getStringAttribute("npx_quantity", "1"), dontSendNotification);
+	NIDAQChannelsEntry->setText(xml->getStringAttribute("nidaq_channels", "16"), dontSendNotification);
+	NIDAQQuantityEntry->setText(xml->getStringAttribute("nidaq_quantity", "1"), dontSendNotification);
     
-}
-
-
-Visualizer* SourceSimEditor::createNewCanvas(void)
-{
-	/*
-    std::cout << "Button clicked..." << std::endl;
-    GenericProcessor* processor = (GenericProcessor*) getProcessor();
-    std::cout << "Got processor." << std::endl;
-    canvas = new SourceSimCanvas(processor, this, thread);
-    std::cout << "Created canvas." << std::endl;
-	*/
-    return nullptr;
-}
-
-
-/********************************************/
-
-SourceSimCanvas::SourceSimCanvas(GenericProcessor* p, SourceSimEditor* editor_, SourceThread* thread) : editor(editor_)
-{
-
-    processor = (SourceNode*) p;
-
-/*
-    sourceSimViewport = new Viewport();
-
-	XmlElement source_sim_info = thread->getInfoXml();
-
-	if (source_sim_info.hasTagName("NEUROPIX-PXI"))
-	{
-		forEachXmlChildElement(source_sim_info, e)
-		{
-			if (e->hasTagName("BASESTATION"))
-			{
-				slot = e->getIntAttribute("slot");
-
-				forEachXmlChildElement(*e, e2)
-				{
-					if (e2->hasTagName("PROBE"))
-					{
-						port = e2->getIntAttribute("port");
-
-						std::cout << "Creating interface for " << slot << ":" << port << std::endl;
-
-						SourceSimInterface* sourceSimInterface = new SourceSimInterface(source_sim_info, slot, port, thread, (NeuropixEditor*)p->getEditor());
-						sourceSimInterfaces.add(neuropixInterface);
-					}
-				}
-			}
-		}
-	}
-
-    sourceSimViewport->setViewedComponent(sourceSimInterfaces[0], false);
-    addAndMakeVisible(sourceSimViewport);
-
-    resized();
-    update();
-	*/
-}
-
-SourceSimCanvas::~SourceSimCanvas()
-{
-
-}
-
-void SourceSimCanvas::paint(Graphics& g)
-{
-    g.fillAll(Colours::darkgrey);
-}
-
-void SourceSimCanvas::refresh()
-{
-    repaint();
-}
-
-void SourceSimCanvas::refreshState()
-{
-    resized();
-}
-
-void SourceSimCanvas::update()
-{
-
-}
-
-void SourceSimCanvas::beginAnimation()
-{
-}
-
-void SourceSimCanvas::endAnimation()
-{
-}
-
-void SourceSimCanvas::resized()
-{
-
-    sourceSimViewport->setBounds(0,0,getWidth(),getHeight());
-
-	for (int i = 0; i < sourceSimInterfaces.size(); i++)
-		sourceSimInterfaces[i]->setBounds(0,0,getWidth()-sourceSimViewport->getScrollBarThickness(), 600);
-}
-
-void SourceSimCanvas::setParameter(int x, float f)
-{
-
-}
-
-void SourceSimCanvas::setParameter(int a, int b, int c, float d)
-{
-}
-
-void SourceSimCanvas::buttonClicked(Button* button)
-{
-
-}
-
-
-void SourceSimCanvas::saveCustomParametersToXml(XmlElement* xml)
-{
-
-	for (int i = 0; i < sourceSimInterfaces.size(); i++)
-		sourceSimInterfaces[i]->saveParameters(xml);
-}
-
-void SourceSimCanvas::loadCustomParametersFromXml(XmlElement* xml)
-{
-
-	for (int i = 0; i < sourceSimInterfaces.size(); i++)
-		sourceSimInterfaces[i]->loadParameters(xml);
-}
-
-/*****************************************************/
-SourceSimInterface::SourceSimInterface(XmlElement info_, int _id, SourceThread* t, SourceSimEditor* e) : thread(t), editor(e), id(_id), source_sim_info(info_)
-{
-
-    cursorType = MouseCursor::NormalCursor;
-    addMouseListener(this, true);
-
-}
-
-SourceSimInterface::~SourceSimInterface()
-{
-
-}
-
-void SourceSimInterface::updateInfoString()
-{
-    /*
-	String mainString;
-	String infoString;
-
-	infoString += "API Version: ";
-	infoString += neuropix_info.getChildByName("API")->getStringAttribute("version", "not found");
-	infoString += "\n";
-	infoString += "\n";
-	infoString += "\n";
-
-	forEachXmlChildElement(source_sim_info, bs_info)
-	{
-		if (bs_info->hasTagName("BASESTATION"))
-		{
-			if (bs_info->getIntAttribute("slot") == slot)
-			{
-				forEachXmlChildElement(*bs_info, probe_info)
-				{
-					if (probe_info->getIntAttribute("port") == port)
-					{
-						
-						infoString += "Basestation ";
-						infoString += String(bs_info->getIntAttribute("index"));
-						mainString += String(bs_info->getIntAttribute("index"));
-
-					}
-				}
-			}
-		}
-	}
-
-	infoLabel->setText(infoString, dontSendNotification);
-	mainLabel->setText(mainString, dontSendNotification);
-    */
-}
-
-void SourceSimInterface::comboBoxChanged(ComboBox* comboBox)
-{
-
-}
-
-void SourceSimInterface::buttonClicked(Button* button)
-{
-
-}
-
-void SourceSimInterface::mouseMove(const MouseEvent& event)
-{
-
-
-}
-
-
-void SourceSimInterface::mouseUp(const MouseEvent& event)
-{
-    
-}
-
-void SourceSimInterface::mouseDown(const MouseEvent& event)
-{
-
-}
-
-void SourceSimInterface::mouseDrag(const MouseEvent& event)
-{
-    
-}
-
-void SourceSimInterface::mouseWheelMove(const MouseEvent&  event, const MouseWheelDetails&   wheel)
-{
-
-}
-
-MouseCursor SourceSimInterface::getMouseCursor()
-{
-    MouseCursor c = MouseCursor(cursorType);
-
-    return c;
-}
-
-void SourceSimInterface::paint(Graphics& g)
-{
-
-}
-
-void SourceSimInterface::timerCallback()
-{
- 
-}
-
-
-void SourceSimInterface::saveParameters(XmlElement* xml)
-{
-
-	std::cout << "Saving Source Sim display." << std::endl;
-
-	//XmlElement* xmlNode = xml->createNewChildElement("PROBE");
-
-}
-
-void SourceSimInterface::loadParameters(XmlElement* xml)
-{
-
 }
