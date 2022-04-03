@@ -79,10 +79,10 @@ void SourceSimThread::updateSettings(OwnedArray<ContinuousChannel>* continuousCh
 
     for (int i = 0; i < settings.numProbes; i++)
     {
-        std::cout << "Probe " << i << " AP; " << settings.channelsPerProbe << " channels." << std::endl;
+        //std::cout << "Probe " << i << " AP; " << settings.channelsPerProbe << " channels." << std::endl;
 
-        String apBandName = "Probe " + probeNames[i] + " AP";
-        String lfpBandName = "Probe " + probeNames[i] + " LFP";
+        String apBandName = "Probe-" + probeNames[i] + "-AP";
+        String lfpBandName = "Probe-" + probeNames[i] + "-LFP";
 
         DataStream::Settings apSettings{
             apBandName,
@@ -126,7 +126,7 @@ void SourceSimThread::updateSettings(OwnedArray<ContinuousChannel>* continuousCh
         apSyncLine = new EventChannel(apSyncSettings);
         eventChannels->add(apSyncLine);
             
-        std::cout << "Probe " << i << " LFP; " << settings.channelsPerProbe << " channels." << std::endl;
+        //std::cout << "Probe " << i << " LFP; " << settings.channelsPerProbe << " channels." << std::endl;
 
         DataStream::Settings lfpSettings{
             lfpBandName,
@@ -174,7 +174,7 @@ void SourceSimThread::updateSettings(OwnedArray<ContinuousChannel>* continuousCh
     for (int i = 0; i < settings.numNIDAQ; i++)
     {
 
-        std::cout << "NI Device " << i << "; " << settings.channelsPerNIDAQ << " channels." << std::endl;
+        //std::cout << "NI Device " << i << "; " << settings.channelsPerNIDAQ << " channels." << std::endl;
 
         String nidaqName = "Dev" + String(i);
 

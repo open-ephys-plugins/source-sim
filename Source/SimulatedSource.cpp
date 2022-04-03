@@ -69,10 +69,13 @@ void SimulatedSource::run()
 	int64 uSecPerBuffer = samplesPerBuffer / sampleRate * 1e6;
 	eventCode = 0;
 
+	int64 start = Time::getHighResolutionTicks();
+	int64 bufferCount = 0;
+
 	while (!threadShouldExit())
 	{
 
-		int64 start = Time::getHighResolutionTicks();
+		bufferCount++;
 
 		for (int sample_num = 0; sample_num < samplesPerBuffer; sample_num++)
 		{
@@ -100,9 +103,9 @@ void SimulatedSource::run()
 
 		int64 uSecElapsed = int64(Time::highResolutionTicksToSeconds(Time::getHighResolutionTicks() - start) * 1e6);
 
-		if (uSecElapsed < uSecPerBuffer)
+		if (uSecElapsed < (uSecPerBuffer * bufferCount))
 		{
-			std::this_thread::sleep_for(std::chrono::microseconds(uSecPerBuffer - uSecElapsed));
+			std::this_thread::sleep_for(std::chrono::microseconds((uSecPerBuffer * bufferCount) - uSecElapsed));
 		}
 	}
 }
