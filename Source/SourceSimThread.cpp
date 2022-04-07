@@ -60,7 +60,7 @@ void SourceSimThread::updateSettings(OwnedArray<ContinuousChannel>* continuousCh
 {
 
     std::cout << "Source Sim initializing data streams." << std::endl;
-    
+
     dataStreams->clear();
     eventChannels->clear();
     continuousChannels->clear();
@@ -125,7 +125,7 @@ void SourceSimThread::updateSettings(OwnedArray<ContinuousChannel>* continuousCh
 
         apSyncLine = new EventChannel(apSyncSettings);
         eventChannels->add(apSyncLine);
-            
+
         //std::cout << "Probe " << i << " LFP; " << settings.channelsPerProbe << " channels." << std::endl;
 
         DataStream::Settings lfpSettings{
@@ -247,6 +247,9 @@ bool SourceSimThread::foundInputSource()
 
 bool SourceSimThread::startAcquisition()
 {
+
+    for (auto source : sources)
+        source->buffer->clear();
 
     for (auto source : sources)
         source->startThread();
