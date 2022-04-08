@@ -35,7 +35,7 @@ SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceSimThread* 
 	: GenericEditor(parentNode)
 {
 
-	desiredWidth = 250;
+	desiredWidth = 180;
     thread = t;
 
 	clockFreqLabel = new Label("clkFreqLabel", "CLK (Hz)");
