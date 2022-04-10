@@ -29,6 +29,7 @@
 #include <ctime>
 #include <ratio>
 #include <chrono>
+#include <thread>
 
 #define PI 3.14159f
 #define MAX_SAMPLES_PER_BUFFER 300

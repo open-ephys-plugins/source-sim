@@ -23,7 +23,7 @@
 
 #include "SimulatedSource.h"
 
-SimulatedSource::SimulatedSource(String name, int channels_, float sampleRate_, SimulatedSourceType type) 
+SimulatedSource::SimulatedSource(String name, int channels_, float sampleRate_, SimulatedSourceType type)
 	: Thread(name)
 {
 
@@ -52,7 +52,7 @@ SimulatedSource::SimulatedSource(String name, int channels_, float sampleRate_, 
 		samplesPerBuffer = 300;
 		break;
 	}
-	
+
 }
 
 void SimulatedSource::updateClockFrequency(int freq, float tol)
@@ -98,7 +98,6 @@ void SimulatedSource::run()
 
 			event_codes[sample_num] = eventCode;
 		}
-		
 
 		buffer->addToBuffer(samples, sampleNumbers, timestamps, event_codes, samplesPerBuffer);
 
