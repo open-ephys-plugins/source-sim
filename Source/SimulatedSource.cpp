@@ -65,7 +65,7 @@ void SimulatedSource::updateClockFrequency(int freq, float tol)
 void SimulatedSource::run()
 {
 
-	int64 timestamp = 0;
+	int64 sampleNumber = 0;
 	int64 uSecPerBuffer = samplesPerBuffer / sampleRate * 1e6;
 	eventCode = 0;
 
@@ -82,12 +82,13 @@ void SimulatedSource::run()
 
 			for (int i = 0; i < numChannels; i++)
 			{
-				samples[i + sample_num * numChannels] = (*data)[timestamp % availableSamples];
+				samples[i + sample_num * numChannels] = (*data)[sampleNumber % availableSamples];
 			}
 
-			timestamps[sample_num] = timestamp++;
+			sampleNumbers[sample_num] = sampleNumber++;
+			timestamps[sample_num] = -1.0;
 			
-			if (timestamp % int(sampleRate) == 0)
+			if (sampleNumber % int(sampleRate) == 0)
 			{
 				if (eventCode == 0)
 					eventCode = 1;
@@ -99,7 +100,7 @@ void SimulatedSource::run()
 		}
 		
 
-		buffer->addToBuffer(samples, timestamps, event_codes, samplesPerBuffer);
+		buffer->addToBuffer(samples, sampleNumbers, timestamps, event_codes, samplesPerBuffer);
 
 		int64 uSecElapsed = int64(Time::highResolutionTicksToSeconds(Time::getHighResolutionTicks() - start) * 1e6);
 

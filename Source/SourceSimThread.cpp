@@ -249,6 +249,9 @@ bool SourceSimThread::startAcquisition()
 {
 
     for (auto source : sources)
+        source->buffer->clear();
+
+    for (auto source : sources)
         source->startThread();
 
     return true;
