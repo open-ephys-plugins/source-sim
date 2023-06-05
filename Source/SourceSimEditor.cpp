@@ -84,7 +84,7 @@ SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceSimThread* 
 	NPXDeviceLabel->setBounds(5,80,120,20);
 	addAndMakeVisible(NPXDeviceLabel);
 
-	NPXChannelsEntry = new NumericEntry("NPXChannelsEntry", "0");
+	NPXChannelsEntry = new NumericEntry("NPXChannelsEntry", "384");
 	NPXChannelsEntry->setBounds(95,80,40,20);
 	NPXChannelsEntry->setEditable(false, true);
 	NPXChannelsEntry->setColour(Label::backgroundColourId, Colours::grey);
@@ -94,7 +94,7 @@ SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceSimThread* 
 	NPXChannelsEntry->addListener(this);
 	addAndMakeVisible(NPXChannelsEntry);
 
-	NPXQuantityEntry = new NumericEntry("NPXQuantityEntry", "0");
+	NPXQuantityEntry = new NumericEntry("NPXQuantityEntry", "2");
 	NPXQuantityEntry->setBounds(137,80,30,20);
 	NPXQuantityEntry->setEditable(false, true);
 	NPXQuantityEntry->setColour(Label::backgroundColourId, Colours::grey);
@@ -108,7 +108,7 @@ SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceSimThread* 
 	NIDAQDeviceLabel->setBounds(5,105,120,20);
 	addAndMakeVisible(NIDAQDeviceLabel);
 
-	NIDAQChannelsEntry = new NumericEntry("NIDAQChannelsEntry", "0");
+	NIDAQChannelsEntry = new NumericEntry("NIDAQChannelsEntry", "8");
 	NIDAQChannelsEntry->setBounds(95,105,40,20);
 	NIDAQChannelsEntry->setEditable(false, true);
 	NIDAQChannelsEntry->setColour(Label::backgroundColourId, Colours::grey);
@@ -118,7 +118,7 @@ SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceSimThread* 
 	NIDAQChannelsEntry->addListener(this);
 	addAndMakeVisible(NIDAQChannelsEntry);
 
-	NIDAQQuantityEntry = new NumericEntry("NIDAQQuantityEntry", "0");
+	NIDAQQuantityEntry = new NumericEntry("NIDAQQuantityEntry", "1");
 	NIDAQQuantityEntry->setBounds(137,105,30,20);
 	NIDAQQuantityEntry->setEditable(false, true);
 	NIDAQQuantityEntry->setColour(Label::backgroundColourId, Colours::grey);

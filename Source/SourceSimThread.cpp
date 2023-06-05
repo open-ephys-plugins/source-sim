@@ -59,23 +59,20 @@ void SourceSimThread::updateSettings(OwnedArray<ContinuousChannel>* continuousCh
 		OwnedArray<ConfigurationObject>* configurationObjects)
 {
 
-    std::cout << "Source Sim initializing data streams." << std::endl;
-
-    dataStreams->clear();
-    eventChannels->clear();
     continuousChannels->clear();
+    eventChannels->clear();
     spikeChannels->clear();
+    dataStreams->clear();
     devices->clear();
     configurationObjects->clear();
 
-    sources.clear();
-    sourceBuffers.clear();
-
     PluginSettingsObject settings;
-
     sse->getSettings(settings);
 
-    StringArray probeNames = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O" , "P" };
+    sourceBuffers.clear();
+    sources.clear();
+
+    std::vector<std::string> probeNames = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O" , "P" };
 
     for (int i = 0; i < settings.numProbes; i++)
     {
