@@ -7,6 +7,9 @@ if (NOT DEFINED GUI_BASE_DIR)
 	endif()
 endif()
 
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15" CACHE STRING "Minimum OS X deployment version" FORCE)
+set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "Build architecture for Mac OS X" FORCE)
+
 get_filename_component(PROJECT_FOLDER ${CMAKE_CURRENT_SOURCE_DIR} ABSOLUTE)
 get_filename_component(PLUGIN_NAME ${PROJECT_FOLDER} NAME)
 
