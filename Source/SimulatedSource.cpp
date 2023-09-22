@@ -75,6 +75,8 @@ void SimulatedSource::run()
 	while (!threadShouldExit())
 	{
 
+		float attenuation = 1.0f - float(numSamples) / (2.0f * 60.0 * float(sampleRate));
+
 		bufferCount++;
 
 		for (int sample_num = 0; sample_num < samplesPerBuffer; sample_num++)
@@ -82,21 +84,54 @@ void SimulatedSource::run()
 
 			for (int i = 0; i < numChannels; i++)
 			{
-				samples[i + sample_num * numChannels] = (*data)[sampleNumber % availableSamples];
+				samples[i + sample_num * numChannels] = attenuation * (*data)[sampleNumber % availableSamples];
 			}
 
 			sampleNumbers[sample_num] = sampleNumber++;
 			timestamps[sample_num] = -1.0;
 			
-			if (sampleNumber % int(sampleRate) == 0)
+			if (numSamples < sampleRate * 30.0f)
 			{
-				if (eventCode == 0)
-					eventCode = 1;
-				else
-					eventCode = 0;
+				if (sampleNumber % int(sampleRate) == 0)
+				{
+					if (eventCode == 0)
+						eventCode = 1;
+					else
+						eventCode = 0;
+				}
+			} else if (numSamples < sampleRate * 60.0f)
+			{
+				if (sampleNumber % int(sampleRate / 2) == 0)
+				{
+					if (eventCode == 0)
+						eventCode = 1;
+					else
+						eventCode = 0;
+				}
+			} else if (numSamples < sampleRate * 90.0f)
+			{
+				if (sampleNumber % int(sampleRate / 4) == 0)
+				{
+					if (eventCode == 0)
+						eventCode = 1;
+					else
+						eventCode = 0;
+				}
+			}
+			else
+			{
+				if (sampleNumber % int(sampleRate / 8) == 0)
+				{
+					if (eventCode == 0)
+						eventCode = 1;
+					else
+						eventCode = 0;
+				}
 			}
 
 			event_codes[sample_num] = eventCode;
+
+			numSamples++;
 		}
 
 		buffer->addToBuffer(samples, sampleNumbers, timestamps, event_codes, samplesPerBuffer);

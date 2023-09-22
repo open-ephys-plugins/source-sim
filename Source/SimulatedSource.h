@@ -405,7 +405,7 @@ private:
 	int numChannels;
 	int packetSize;
 	float sampleRate;
-	int64 numSamples;
+	int64 numSamples { 0 };
 
 	bool clkEnabled;
 	uint64 eventCode;
