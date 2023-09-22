@@ -42,13 +42,34 @@ std::unique_ptr<GenericEditor> SourceSimThread::createEditor(SourceNode* sn)
 
 
 SourceSimThread::SourceSimThread(SourceNode* sn) :
-	DataThread(sn)
+	DataThread(sn),
+    sourceNode(sn)
 {
 }
 
 SourceSimThread::~SourceSimThread()
 {
 
+}
+
+void SourceSimThread::registerParameters()
+{
+    settings.numProbes = 1;
+    settings.channelsPerProbe = 384;
+    settings.numNIDAQ = 1;
+    settings.channelsPerNIDAQ = 16;
+    
+    sourceNode->addIntParameter(Parameter::PROCESSOR_SCOPE, "npx_chans", "NPX Chans", 
+        "Number of channels per probe", settings.channelsPerProbe, 1, 384, true);
+
+    sourceNode->addIntParameter(Parameter::PROCESSOR_SCOPE, "npx_probes", "NPX Probes",
+        "Number of probes", settings.numProbes, 0, 20, true);
+
+    sourceNode->addIntParameter(Parameter::PROCESSOR_SCOPE, "nidaq_chans", "NIDAQ Chans",
+        "Number of channels per device", settings.channelsPerNIDAQ, 1, 32, true);
+
+    sourceNode->addIntParameter(Parameter::PROCESSOR_SCOPE, "nidaq_devices", "NIDAQ Devices",
+        "Number of NIDAQs", settings.numNIDAQ, 0, 20, true);
 }
 
 void SourceSimThread::updateSettings(OwnedArray<ContinuousChannel>* continuousChannels,
@@ -65,9 +86,6 @@ void SourceSimThread::updateSettings(OwnedArray<ContinuousChannel>* continuousCh
     dataStreams->clear();
     devices->clear();
     configurationObjects->clear();
-
-    PluginSettingsObject settings;
-    sse->getSettings(settings);
 
     sourceBuffers.clear();
     sources.clear();
@@ -218,6 +236,32 @@ void SourceSimThread::updateSettings(OwnedArray<ContinuousChannel>* continuousCh
 
     }
 }
+
+
+void SourceSimThread::parameterValueChanged(Parameter* param)
+{
+    LOGD("Parameter value changed: ", param->getName(), ". New value: ", param->getValueAsString());
+
+    if (param->getName().equalsIgnoreCase("npx_chans"))
+    {
+        settings.channelsPerProbe = ((IntParameter*)param)->getIntValue();
+    }
+    else if (param->getName().equalsIgnoreCase("npx_probes"))
+    {
+        settings.numProbes = ((IntParameter*)param)->getIntValue();
+    }
+    else if (param->getName().equalsIgnoreCase("nidaq_chans"))
+    {
+        settings.channelsPerNIDAQ = ((IntParameter*)param)->getIntValue();
+    }
+    else if (param->getName().equalsIgnoreCase("nidaq_devices"))
+    {
+        settings.numNIDAQ = ((IntParameter*)param)->getIntValue();
+    }
+
+    CoreServices::updateSignalChain(sse);
+}
+
 
 void SourceSimThread::updateClkFreq(int freq, float tol)
 {

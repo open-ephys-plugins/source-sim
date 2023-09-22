@@ -62,23 +62,8 @@ public:
 	/** Destructor */
 	virtual ~SourceSimEditor();
 
-	/** Disables label editing */
-	void startAcquisition() override;
-
-	/** Enables label editing */
-	void stopAcquisition() override;
-
 	/** Respond to label changes */
 	void labelTextChanged (Label*);
-
-	/** Saves editor parameters */
-	void saveCustomParametersToXml(XmlElement*) override;
-
-	/** Loads editor parameters*/
-	void loadCustomParametersFromXml(XmlElement*) override;
-
-	/** Returns the current settings*/
-	void getSettings(PluginSettingsObject& settings);
 
 private:
 
@@ -93,12 +78,7 @@ private:
 	ScopedPointer<Label> quantityLabel;
 
 	ScopedPointer<Label> NPXDeviceLabel;
-	ScopedPointer<NumericEntry> NPXChannelsEntry;
-	ScopedPointer<NumericEntry> NPXQuantityEntry;
-
 	ScopedPointer<Label> NIDAQDeviceLabel;
-	ScopedPointer<NumericEntry> NIDAQChannelsEntry;
-	ScopedPointer<NumericEntry> NIDAQQuantityEntry;
 
 	SourceSimThread* thread;
 

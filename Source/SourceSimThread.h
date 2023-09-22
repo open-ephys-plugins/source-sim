@@ -66,6 +66,9 @@ public:
 	/** Creates the custom editor */
 	std::unique_ptr<GenericEditor> createEditor(SourceNode* sn);
 
+	/**Create & register parameters*/
+    void registerParameters() override;
+
 	/** Not used -- data buffers are updated inside simulated sources*/
 	bool updateBuffer() { return true;  }
 
@@ -85,13 +88,22 @@ public:
 		OwnedArray<DataStream>* sourceStreams,
 		OwnedArray<DeviceInfo>* devices,
 		OwnedArray<ConfigurationObject>* configurationObjects);
-
-	OwnedArray<SimulatedSource> sources;
-
+	
 	void updateClkFreq(int freq, float tol);
 	void updateClkEnable(int subProcIdx, bool enable);
 
+	/* Called when a parameter value is updated, to allow plugin-specific responses*/
+	void parameterValueChanged(Parameter* param) override;
+
+private:
+
+	OwnedArray<SimulatedSource> sources;
+
 	SourceSimEditor* sse;
+
+	SourceNode* sourceNode;
+
+	PluginSettingsObject settings;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SourceSimThread);
 

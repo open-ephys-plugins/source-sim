@@ -68,7 +68,7 @@ SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceSimThread* 
 	addAndMakeVisible(clockTolEntry);
 
 	//Add title labels
-	deviceLabel = new Label("Dev:", "Dev:");
+	deviceLabel = new Label("Dev:", "Device:");
 	deviceLabel->setBounds(5,55,120,20);
 	addAndMakeVisible(deviceLabel);
 
@@ -84,50 +84,25 @@ SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceSimThread* 
 	NPXDeviceLabel->setBounds(5,80,120,20);
 	addAndMakeVisible(NPXDeviceLabel);
 
-	NPXChannelsEntry = new NumericEntry("NPXChannelsEntry", "384");
-	NPXChannelsEntry->setBounds(95,80,40,20);
-	NPXChannelsEntry->setEditable(false, true);
-	NPXChannelsEntry->setColour(Label::backgroundColourId, Colours::grey);
-	NPXChannelsEntry->setColour(Label::backgroundWhenEditingColourId, Colours::white);
-	NPXChannelsEntry->setJustificationType(Justification::centredRight);
-	NPXChannelsEntry->setText(String(384), juce::NotificationType::sendNotification);
-	NPXChannelsEntry->addListener(this);
-	addAndMakeVisible(NPXChannelsEntry);
+	addTextBoxParameterEditor(Parameter::PROCESSOR_SCOPE, "npx_chans", 95, 80);
+	getParameterEditor("npx_chans")->setLayout(ParameterEditor::nameHidden);
+    getParameterEditor("npx_chans")->setSize(40, 20);
 
-	NPXQuantityEntry = new NumericEntry("NPXQuantityEntry", "2");
-	NPXQuantityEntry->setBounds(137,80,30,20);
-	NPXQuantityEntry->setEditable(false, true);
-	NPXQuantityEntry->setColour(Label::backgroundColourId, Colours::grey);
-	NPXQuantityEntry->setColour(Label::backgroundWhenEditingColourId, Colours::white);
-	NPXQuantityEntry->setJustificationType(Justification::centredRight);
-	NPXQuantityEntry->setText(String(1), juce::NotificationType::sendNotification);
-	NPXQuantityEntry->addListener(this);
-	addAndMakeVisible(NPXQuantityEntry);
+	addTextBoxParameterEditor(Parameter::PROCESSOR_SCOPE, "npx_probes", 140, 80);
+	getParameterEditor("npx_probes")->setLayout(ParameterEditor::nameHidden);
+    getParameterEditor("npx_probes")->setSize(30, 20);
 
 	NIDAQDeviceLabel = new Label("NIDAQ", "NIDAQ-Sim");
 	NIDAQDeviceLabel->setBounds(5,105,120,20);
 	addAndMakeVisible(NIDAQDeviceLabel);
 
-	NIDAQChannelsEntry = new NumericEntry("NIDAQChannelsEntry", "8");
-	NIDAQChannelsEntry->setBounds(95,105,40,20);
-	NIDAQChannelsEntry->setEditable(false, true);
-	NIDAQChannelsEntry->setColour(Label::backgroundColourId, Colours::grey);
-	NIDAQChannelsEntry->setColour(Label::backgroundWhenEditingColourId, Colours::white);
-	NIDAQChannelsEntry->setJustificationType(Justification::centredRight);
-	NIDAQChannelsEntry->setText(String(16), juce::NotificationType::sendNotification);
-	NIDAQChannelsEntry->addListener(this);
-	addAndMakeVisible(NIDAQChannelsEntry);
+	addTextBoxParameterEditor(Parameter::PROCESSOR_SCOPE, "nidaq_chans", 95, 105);
+	getParameterEditor("nidaq_chans")->setLayout(ParameterEditor::nameHidden);
+    getParameterEditor("nidaq_chans")->setSize(40, 20);
 
-	NIDAQQuantityEntry = new NumericEntry("NIDAQQuantityEntry", "1");
-	NIDAQQuantityEntry->setBounds(137,105,30,20);
-	NIDAQQuantityEntry->setEditable(false, true);
-	NIDAQQuantityEntry->setColour(Label::backgroundColourId, Colours::grey);
-	NIDAQQuantityEntry->setColour(Label::backgroundWhenEditingColourId, Colours::white);
-	NIDAQQuantityEntry->setJustificationType(Justification::centredRight);
-	NIDAQQuantityEntry->setText(String(1), juce::NotificationType::sendNotification);
-	NIDAQQuantityEntry->addListener(this);
-	addAndMakeVisible(NIDAQQuantityEntry);
-
+	addTextBoxParameterEditor(Parameter::PROCESSOR_SCOPE, "nidaq_devices", 140, 105);
+	getParameterEditor("nidaq_devices")->setLayout(ParameterEditor::nameHidden);
+    getParameterEditor("nidaq_devices")->setSize(30, 20);
 
 }
 
@@ -165,93 +140,6 @@ void SourceSimEditor::labelTextChanged (Label* label)
 		return;
 	}
 	
-	if (label == NPXChannelsEntry)
-	{
-		int channels = NPXChannelsEntry->getText().getIntValue();
-		
-		if (channels < 0 || channels > 384)
-		{
-		    channels = 384;
-            NPXChannelsEntry->setText(String(channels), juce::NotificationType::sendNotification);
-		}
-	}
-	else if (label == NPXQuantityEntry)
-	{
-		int numProbes = NPXQuantityEntry->getText().getIntValue();
-
-		if (numProbes < 0 || numProbes > 20)
-		{
-		    numProbes = 1;
-            NPXQuantityEntry->setText(String(numProbes), juce::NotificationType::sendNotification);
-		}
-
-	}
-	else if (label == NIDAQChannelsEntry)
-	{
-		int channels = NIDAQChannelsEntry->getText().getIntValue();
-		if (channels < 0 || channels > 32)
-		{
-		    channels = 8;
-            NIDAQChannelsEntry->setText(String(channels), juce::NotificationType::sendNotification);
-		}
-
-	}
-	else if (label == NIDAQQuantityEntry)
-	{
-		int numDevices = NIDAQQuantityEntry->getText().getIntValue();
-		if (numDevices < 0 || numDevices > 20)
-		{
-		    numDevices = 1;
-            NIDAQQuantityEntry->setText(String(numDevices), juce::NotificationType::sendNotification);
-		}
-
-	}
-	
     CoreServices::updateSignalChain(this);	
 	
-}
-
-void SourceSimEditor::getSettings(PluginSettingsObject& settings)
-{
-	settings.numProbes = NPXQuantityEntry->getText().getIntValue();
-	settings.channelsPerProbe = NPXChannelsEntry->getText().getIntValue();
-	settings.numNIDAQ = NIDAQQuantityEntry->getText().getIntValue();
-	settings.channelsPerNIDAQ = NIDAQChannelsEntry->getText().getIntValue();
-}
-
-void SourceSimEditor::startAcquisition()
-{
-	NPXChannelsEntry->setEnabled(false);
-	NPXQuantityEntry->setEnabled(false);
-	NIDAQChannelsEntry->setEnabled(false);
-	NIDAQQuantityEntry->setEnabled(false);
-}
-
-void SourceSimEditor::stopAcquisition()
-{
-	NPXChannelsEntry->setEnabled(true);
-	NPXQuantityEntry->setEnabled(true);
-	NIDAQChannelsEntry->setEnabled(true);
-	NIDAQQuantityEntry->setEnabled(true);
-}
-
-
-void SourceSimEditor::saveCustomParametersToXml(XmlElement* xml)
-{
-
-	xml->setAttribute("npx_channels", NPXChannelsEntry->getText());
-	xml->setAttribute("npx_quantity", NPXQuantityEntry->getText());
-	xml->setAttribute("nidaq_channels", NIDAQChannelsEntry->getText());
-	xml->setAttribute("nidaq_quantity", NIDAQQuantityEntry->getText());
-
-}
-
-void SourceSimEditor::loadCustomParametersFromXml(XmlElement* xml)
-{
-    
-	NPXChannelsEntry->setText(xml->getStringAttribute("npx_channels", "384"), dontSendNotification);
-	NPXQuantityEntry->setText(xml->getStringAttribute("npx_quantity", "1"), dontSendNotification);
-	NIDAQChannelsEntry->setText(xml->getStringAttribute("nidaq_channels", "16"), dontSendNotification);
-	NIDAQQuantityEntry->setText(xml->getStringAttribute("nidaq_quantity", "1"), dontSendNotification);
-    
 }
