@@ -42,8 +42,7 @@ std::unique_ptr<GenericEditor> SourceSimThread::createEditor(SourceNode* sn)
 
 
 SourceSimThread::SourceSimThread(SourceNode* sn) :
-	DataThread(sn),
-    sourceNode(sn)
+	DataThread(sn)
 {
 }
 
@@ -59,17 +58,17 @@ void SourceSimThread::registerParameters()
     settings.numNIDAQ = 1;
     settings.channelsPerNIDAQ = 16;
     
-    sourceNode->addIntParameter(Parameter::PROCESSOR_SCOPE, "npx_chans", "NPX Chans", 
-        "Number of channels per probe", settings.channelsPerProbe, 1, 384, true);
+    addIntParameter(Parameter::PROCESSOR_SCOPE, "npx_chans", "NPX Chans", "Number of channels per probe",
+        settings.channelsPerProbe, 1, 384, true);
 
-    sourceNode->addIntParameter(Parameter::PROCESSOR_SCOPE, "npx_probes", "NPX Probes",
-        "Number of probes", settings.numProbes, 0, 20, true);
+    addIntParameter(Parameter::PROCESSOR_SCOPE, "npx_probes", "NPX Probes", "Number of probes",
+        settings.numProbes, 0, 20, true);
 
-    sourceNode->addIntParameter(Parameter::PROCESSOR_SCOPE, "nidaq_chans", "NIDAQ Chans",
-        "Number of channels per device", settings.channelsPerNIDAQ, 1, 32, true);
+    addIntParameter(Parameter::PROCESSOR_SCOPE, "nidaq_chans", "NIDAQ Chans", "Number of channels per device",
+        settings.channelsPerNIDAQ, 1, 32, true);
 
-    sourceNode->addIntParameter(Parameter::PROCESSOR_SCOPE, "nidaq_devices", "NIDAQ Devices",
-        "Number of NIDAQs", settings.numNIDAQ, 0, 20, true);
+    addIntParameter(Parameter::PROCESSOR_SCOPE, "nidaq_devices", "NIDAQ Devices", "Number of NIDAQs",
+        settings.numNIDAQ, 0, 20, true);
 }
 
 void SourceSimThread::updateSettings(OwnedArray<ContinuousChannel>* continuousChannels,

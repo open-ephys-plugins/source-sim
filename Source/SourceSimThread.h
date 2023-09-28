@@ -101,8 +101,6 @@ private:
 
 	SourceSimEditor* sse;
 
-	SourceNode* sourceNode;
-
 	PluginSettingsObject settings;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SourceSimThread);
