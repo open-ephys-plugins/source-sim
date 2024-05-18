@@ -82,9 +82,9 @@ void SimulatedSource::run()
 		for (int sample_num = 0; sample_num < samplesPerBuffer; sample_num++)
 		{
 
-			for (int i = 0; i < numChannels; i++)
+			for (int chan = 0; chan < numChannels; chan++)
 			{
-				samples[i + sample_num * numChannels] = attenuation * (*data)[sampleNumber % availableSamples];
+				samples[(chan * samplesPerBuffer) + sample_num] = attenuation * (*data)[sampleNumber % availableSamples];
 			}
 
 			sampleNumbers[sample_num] = sampleNumber++;

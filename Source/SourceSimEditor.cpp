@@ -45,8 +45,6 @@ SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceSimThread* 
 	clockFreqEntry = new NumericEntry("clkFreqEntry", "10");
 	clockFreqEntry->setBounds(55,30,40,20);
 	clockFreqEntry->setEditable(false, true);
-	clockFreqEntry->setColour(Label::backgroundColourId, Colours::grey);
-	clockFreqEntry->setColour(Label::backgroundWhenEditingColourId, Colours::white);
 	clockFreqEntry->setJustificationType(Justification::centredRight);
 	clockFreqEntry->setText("1", juce::NotificationType::sendNotification);
 	clockFreqEntry->addListener(this);
@@ -59,8 +57,6 @@ SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceSimThread* 
 	clockTolEntry = new NumericEntry("clkFreqEntry", "0");
 	clockTolEntry->setBounds(120,30,40,20);
 	clockTolEntry->setEditable(false, true);
-	clockTolEntry->setColour(Label::backgroundColourId, Colours::grey);
-	clockTolEntry->setColour(Label::backgroundWhenEditingColourId, Colours::white);
 	clockTolEntry->setJustificationType(Justification::centredRight);
 	clockTolEntry->setText("0", juce::NotificationType::sendNotification);
 	clockTolEntry->setEnabled(false);
