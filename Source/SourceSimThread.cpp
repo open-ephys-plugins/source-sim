@@ -59,7 +59,7 @@ void SourceSimThread::registerParameters()
     settings.channelsPerNIDAQ = 16;
     
     addIntParameter(Parameter::PROCESSOR_SCOPE, "npx_chans", "NPX Chans", "Number of channels per probe",
-        settings.channelsPerProbe, 1, 384, true);
+        settings.channelsPerProbe, 1, 10000, true);
 
     addIntParameter(Parameter::PROCESSOR_SCOPE, "npx_probes", "NPX Probes", "Number of probes",
         settings.numProbes, 0, 20, true);
