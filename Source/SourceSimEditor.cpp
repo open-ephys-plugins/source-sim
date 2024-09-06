@@ -77,7 +77,7 @@ SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceSimThread* 
 	addAndMakeVisible(quantityLabel);
 
 	NPXDeviceLabel = new Label("NPX1 Probe", "NPX1 Probe");
-	NPXDeviceLabel->setBounds(5,80,120,20);
+	NPXDeviceLabel->setBounds(5,80,85,20);
 	addAndMakeVisible(NPXDeviceLabel);
 
 	addTextBoxParameterEditor(Parameter::PROCESSOR_SCOPE, "npx_chans", 95, 80);
@@ -89,7 +89,7 @@ SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceSimThread* 
     getParameterEditor("npx_probes")->setSize(30, 20);
 
 	NIDAQDeviceLabel = new Label("NIDAQ", "NIDAQ-Sim");
-	NIDAQDeviceLabel->setBounds(5,105,120,20);
+	NIDAQDeviceLabel->setBounds(5,105,85,20);
 	addAndMakeVisible(NIDAQDeviceLabel);
 
 	addTextBoxParameterEditor(Parameter::PROCESSOR_SCOPE, "nidaq_chans", 95, 105);
