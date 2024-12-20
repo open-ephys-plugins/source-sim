@@ -35,6 +35,7 @@ class SourceSimEditor;
 
 struct PluginSettingsObject
 {
+	int clkFreq; // Hz
 	int numProbes;
 	int channelsPerProbe;
 	int numNIDAQ;

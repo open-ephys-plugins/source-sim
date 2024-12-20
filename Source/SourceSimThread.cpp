@@ -53,11 +53,15 @@ SourceSimThread::~SourceSimThread()
 
 void SourceSimThread::registerParameters()
 {
+    settings.clkFreq = 1; //Hz
     settings.numProbes = 1;
     settings.channelsPerProbe = 384;
     settings.numNIDAQ = 1;
     settings.channelsPerNIDAQ = 16;
-    
+
+    addIntParameter(Parameter::PROCESSOR_SCOPE, "clk_hz", "Clock Frequency", "Clock Frequency",
+        settings.clkFreq, 0, 10000, false);
+
     addIntParameter(Parameter::PROCESSOR_SCOPE, "npx_chans", "NPX Chans", "Number of channels per probe",
         settings.channelsPerProbe, 1, 10000, true);
 
@@ -89,7 +93,9 @@ void SourceSimThread::updateSettings(OwnedArray<ContinuousChannel>* continuousCh
     sourceBuffers.clear();
     sources.clear();
 
-    std::vector<std::string> probeNames = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O" , "P" };
+    std::vector<std::string> probeNames = { 
+        "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O" , "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
+    };
 
     for (int i = 0; i < settings.numProbes; i++)
     {
@@ -239,9 +245,15 @@ void SourceSimThread::updateSettings(OwnedArray<ContinuousChannel>* continuousCh
 
 void SourceSimThread::parameterValueChanged(Parameter* param)
 {
-    LOGD("Parameter value changed: ", param->getName(), ". New value: ", param->getValueAsString());
+    LOGC("Parameter value changed: ", param->getName(), ". New value: ", param->getValueAsString());
 
-    if (param->getName().equalsIgnoreCase("npx_chans"))
+    if (param->getName().equalsIgnoreCase("clk_hz"))
+    {
+        settings.clkFreq = ((FloatParameter*)param)->getValue();
+        for (auto source : sources)
+            source->updateClockFrequency(settings.clkFreq);
+    }
+    else if (param->getName().equalsIgnoreCase("npx_chans"))
     {
         settings.channelsPerProbe = ((IntParameter*)param)->getIntValue();
     }
@@ -258,36 +270,17 @@ void SourceSimThread::parameterValueChanged(Parameter* param)
         settings.numNIDAQ = ((IntParameter*)param)->getIntValue();
     }
 
-    CoreServices::updateSignalChain(sse);
+    if (!param->getName().equalsIgnoreCase("clk_hz"))
+        CoreServices::updateSignalChain(sse);
 }
-
-
-void SourceSimThread::updateClkFreq(int freq, float tol)
-{
-    std::cout << "Update clk freq: " << freq << " tol: " << tol << std::endl;
-
-    //for (auto source : sources)
-   // {
-    //    if (source->isTimerRunning())
-    //        source->updateClkFreq(freq, tol);
-    //}
-}
-
-
-void SourceSimThread::updateClkEnable(int subProcIdx, bool enable)
-{
-  // sources[subProcIdx]->updateClk(enable);
-}
-
 
 bool SourceSimThread::foundInputSource()
 {
-    return true;
+    return true; 
 }
 
 bool SourceSimThread::startAcquisition()
 {
-
     for (auto source : sources)
         source->buffer->clear();
 
@@ -299,7 +292,6 @@ bool SourceSimThread::startAcquisition()
 
 bool SourceSimThread::stopAcquisition()
 {
-
     for (auto source : sources)
         source->signalThreadShouldExit();
 

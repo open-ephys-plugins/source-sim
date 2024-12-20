@@ -30,9 +30,7 @@ SimulatedSource::SimulatedSource(String name, int channels_, float sampleRate_, 
 	numChannels = channels_;
 	sampleRate = sampleRate_;
 
-	clkEnabled = true;
-	clk_period = 1; //s
-	clk_tol = 0.001; //sc
+	clkEnabled = true; //TODO: make this configurable
 
 	switch (type)
 	{
@@ -55,11 +53,12 @@ SimulatedSource::SimulatedSource(String name, int channels_, float sampleRate_, 
 
 }
 
-void SimulatedSource::updateClockFrequency(int freq, float tol)
+void SimulatedSource::updateClockFrequency(int freq)
 {
-
-	clk_period = 1 / (float)freq;
-
+	if (freq > 0)
+		clk_period = 1.0f / (float)freq;
+	else
+		clk_period = 0;
 }
 
 void SimulatedSource::run()
@@ -89,28 +88,11 @@ void SimulatedSource::run()
 
 			sampleNumbers[sample_num] = sampleNumber++;
 			timestamps[sample_num] = -1.0;
-			
-			if (numSamples < sampleRate * 30.0f)
+
+			if (clk_period > 0)
 			{
-				if (sampleNumber % int(sampleRate) == 0)
-				{
-					if (eventCode == 0)
-						eventCode = 1;
-					else
-						eventCode = 0;
-				}
-			} else if (numSamples < sampleRate * 60.0f)
-			{
-				if (sampleNumber % int(sampleRate / 2) == 0)
-				{
-					if (eventCode == 0)
-						eventCode = 1;
-					else
-						eventCode = 0;
-				}
-			} else if (numSamples < sampleRate * 90.0f)
-			{
-				if (sampleNumber % int(sampleRate / 4) == 0)
+				int samplesPerClkPeriod = int(sampleRate * clk_period / 2);
+				if (sampleNumber % samplesPerClkPeriod == 0)
 				{
 					if (eventCode == 0)
 						eventCode = 1;
@@ -118,15 +100,9 @@ void SimulatedSource::run()
 						eventCode = 0;
 				}
 			}
-			else
+			else if (eventCode != 0)
 			{
-				if (sampleNumber % int(sampleRate / 8) == 0)
-				{
-					if (eventCode == 0)
-						eventCode = 1;
-					else
-						eventCode = 0;
-				}
+				eventCode = 0;
 			}
 
 			event_codes[sample_num] = eventCode;

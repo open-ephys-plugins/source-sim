@@ -23,57 +23,35 @@
 
 #include "SourceSimEditor.h"
 
-TextEditor* NumericEntry::createEditorComponent()
-{
-	TextEditor* const ed = Label::createEditorComponent();
-    ed->setInputRestrictions(4, "0123456789.");
-    return ed;
-}
-
-
 SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceSimThread* t)
 	: GenericEditor(parentNode)
 {
-
 	desiredWidth = 180;
     thread = t;
 
-	clockFreqLabel = new Label("clkFreqLabel", "CLK (Hz)");
-	clockFreqLabel->setBounds(5,30,50,20);
-	addAndMakeVisible(clockFreqLabel);
+	clockLabel = new Label("clkFreqLabel", "CLK");
+	clockLabel->setBounds(5,30,50,20);
+	addAndMakeVisible(clockLabel);
 
-	clockFreqEntry = new NumericEntry("clkFreqEntry", "10");
-	clockFreqEntry->setBounds(55,30,40,20);
-	clockFreqEntry->setEditable(false, true);
-	clockFreqEntry->setJustificationType(Justification::centredRight);
-	clockFreqEntry->setText("1", juce::NotificationType::sendNotification);
-	clockFreqEntry->addListener(this);
-	addAndMakeVisible(clockFreqEntry);
+	addTextBoxParameterEditor(Parameter::PROCESSOR_SCOPE, "clk_hz", 95, 30);
+	getParameterEditor("clk_hz")->setLayout(ParameterEditor::nameHidden);
+	getParameterEditor("clk_hz")->setSize(40, 20);
 
-	clockTolLabel = new Label("clkFreqLabel", "+/- ");
-	clockTolLabel->setBounds(95,30,30,20);
-	addAndMakeVisible(clockTolLabel);
-
-	clockTolEntry = new NumericEntry("clkFreqEntry", "0");
-	clockTolEntry->setBounds(120,30,40,20);
-	clockTolEntry->setEditable(false, true);
-	clockTolEntry->setJustificationType(Justification::centredRight);
-	clockTolEntry->setText("0", juce::NotificationType::sendNotification);
-	clockTolEntry->setEnabled(false);
-	clockTolEntry->addListener(this);
-	addAndMakeVisible(clockTolEntry);
+	freqLabel = new Label("Freq:", "Hz");
+	freqLabel->setBounds(140,30,40,20);
+	addAndMakeVisible(freqLabel);
 
 	//Add title labels
-	deviceLabel = new Label("Dev:", "Device:");
+	deviceLabel = new Label("Dev:", "Device");
 	deviceLabel->setBounds(5,55,120,20);
 	addAndMakeVisible(deviceLabel);
 
-	channelsLabel = new Label("CH:", "CH:");
+	channelsLabel = new Label("CH:", "CH");
 	channelsLabel->setBounds(95,55,30,20);
 	addAndMakeVisible(channelsLabel);
 
-	quantityLabel = new Label("QTY:", "QTY:");
-	quantityLabel->setBounds(130,55,40,20);
+	quantityLabel = new Label("QTY:", "QTY");
+	quantityLabel->setBounds(138,55,40,20);
 	addAndMakeVisible(quantityLabel);
 
 	NPXDeviceLabel = new Label("NPX1 Probe", "NPX1 Probe");
@@ -102,40 +80,4 @@ SourceSimEditor::SourceSimEditor(GenericProcessor* parentNode, SourceSimThread* 
 
 }
 
-SourceSimEditor::~SourceSimEditor()
-{
-
-}
-
-void SourceSimEditor::labelTextChanged (Label* label)
-{
-
-	std::cout << "Detected label change" << std::endl;
-
-	int freq = clockFreqEntry->getText().getIntValue();
-	float tol = clockTolEntry->getText().getFloatValue();
-
-	if (label == clockFreqEntry)
-	{
-		/* Restrict to integer values only */
-		label->setText(String(freq),juce::NotificationType::sendNotification);
-
-		thread->updateClkFreq(freq, tol);
-		return;
-	}
-	else if (label == clockTolEntry)
-	{
-		/*Restrict to % of clk freq */
-		if (!(tol <= (float)freq / 10))
-		{
-			label->setText("0", juce::NotificationType::sendNotification);
-			tol = 0;
-		}
-
-		thread->updateClkFreq(freq, tol);
-		return;
-	}
-	
-    CoreServices::updateSignalChain(this);	
-	
-}
+SourceSimEditor::~SourceSimEditor() {}

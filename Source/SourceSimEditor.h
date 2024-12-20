@@ -51,8 +51,7 @@ public:
 	number of channels per stream.
 
 */
-class SourceSimEditor : public GenericEditor, 
-						public Label::Listener
+class SourceSimEditor : public GenericEditor
 {
 public:
 
@@ -62,16 +61,11 @@ public:
 	/** Destructor */
 	virtual ~SourceSimEditor();
 
-	/** Respond to label changes */
-	void labelTextChanged (Label*);
 
 private:
 
-	ScopedPointer<Label> clockFreqLabel;
-	ScopedPointer<NumericEntry> clockFreqEntry;
-
-	ScopedPointer<Label> clockTolLabel;
-	ScopedPointer<NumericEntry> clockTolEntry;
+	ScopedPointer<Label> clockLabel;
+	ScopedPointer<Label> freqLabel;
 
 	ScopedPointer<Label> deviceLabel;
 	ScopedPointer<Label> channelsLabel;

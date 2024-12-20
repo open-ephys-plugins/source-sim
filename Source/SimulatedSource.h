@@ -388,7 +388,7 @@ public:
 	~SimulatedSource() { }
 
 	/** Updates the frequency at which events are generated */
-	void updateClockFrequency(int freq, float tol);
+	void updateClockFrequency(int freq);
 
 	DataBuffer* buffer;
 
@@ -410,7 +410,6 @@ private:
 	bool clkEnabled;
 	uint64 eventCode;
 	float clk_period;
-	float clk_tol;
 
 	float samples[384 * MAX_SAMPLES_PER_BUFFER];
 	int64 sampleNumbers[MAX_SAMPLES_PER_BUFFER];
