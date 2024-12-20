@@ -26,29 +26,25 @@
 #include "SourceSimEditor.h"
 #include <cmath>
 
-DataThread* SourceSimThread::createDataThread(SourceNode *sn)
+DataThread* SourceSimThread::createDataThread (SourceNode* sn)
 {
-	return new SourceSimThread(sn);
+    return new SourceSimThread (sn);
 }
 
-
-std::unique_ptr<GenericEditor> SourceSimThread::createEditor(SourceNode* sn)
+std::unique_ptr<GenericEditor> SourceSimThread::createEditor (SourceNode* sn)
 {
-    std::unique_ptr<SourceSimEditor> e = std::make_unique<SourceSimEditor>(sn, this);
+    std::unique_ptr<SourceSimEditor> e = std::make_unique<SourceSimEditor> (sn, this);
     sse = e.get();
 
     return e;
 }
 
-
-SourceSimThread::SourceSimThread(SourceNode* sn) :
-	DataThread(sn)
+SourceSimThread::SourceSimThread (SourceNode* sn) : DataThread (sn)
 {
 }
 
 SourceSimThread::~SourceSimThread()
 {
-
 }
 
 void SourceSimThread::registerParameters()
@@ -59,30 +55,24 @@ void SourceSimThread::registerParameters()
     settings.numNIDAQ = 1;
     settings.channelsPerNIDAQ = 16;
 
-    addIntParameter(Parameter::PROCESSOR_SCOPE, "clk_hz", "Clock Frequency", "Clock Frequency",
-        settings.clkFreq, 0, 10000, false);
+    addIntParameter (Parameter::PROCESSOR_SCOPE, "clk_hz", "Clock Frequency", "Clock Frequency", settings.clkFreq, 0, 10000, false);
 
-    addIntParameter(Parameter::PROCESSOR_SCOPE, "npx_chans", "NPX Chans", "Number of channels per probe",
-        settings.channelsPerProbe, 1, 10000, true);
+    addIntParameter (Parameter::PROCESSOR_SCOPE, "npx_chans", "NPX Chans", "Number of channels per probe", settings.channelsPerProbe, 1, 10000, true);
 
-    addIntParameter(Parameter::PROCESSOR_SCOPE, "npx_probes", "NPX Probes", "Number of probes",
-        settings.numProbes, 0, 20, true);
+    addIntParameter (Parameter::PROCESSOR_SCOPE, "npx_probes", "NPX Probes", "Number of probes", settings.numProbes, 0, 20, true);
 
-    addIntParameter(Parameter::PROCESSOR_SCOPE, "nidaq_chans", "NIDAQ Chans", "Number of channels per device",
-        settings.channelsPerNIDAQ, 1, 32, true);
+    addIntParameter (Parameter::PROCESSOR_SCOPE, "nidaq_chans", "NIDAQ Chans", "Number of channels per device", settings.channelsPerNIDAQ, 1, 32, true);
 
-    addIntParameter(Parameter::PROCESSOR_SCOPE, "nidaq_devices", "NIDAQ Devices", "Number of NIDAQs",
-        settings.numNIDAQ, 0, 20, true);
+    addIntParameter (Parameter::PROCESSOR_SCOPE, "nidaq_devices", "NIDAQ Devices", "Number of NIDAQs", settings.numNIDAQ, 0, 20, true);
 }
 
-void SourceSimThread::updateSettings(OwnedArray<ContinuousChannel>* continuousChannels,
-		OwnedArray<EventChannel>* eventChannels,
-		OwnedArray<SpikeChannel>* spikeChannels,
-		OwnedArray<DataStream>* dataStreams,
-		OwnedArray<DeviceInfo>* devices,
-		OwnedArray<ConfigurationObject>* configurationObjects)
+void SourceSimThread::updateSettings (OwnedArray<ContinuousChannel>* continuousChannels,
+                                      OwnedArray<EventChannel>* eventChannels,
+                                      OwnedArray<SpikeChannel>* spikeChannels,
+                                      OwnedArray<DataStream>* dataStreams,
+                                      OwnedArray<DeviceInfo>* devices,
+                                      OwnedArray<ConfigurationObject>* configurationObjects)
 {
-
     continuousChannels->clear();
     eventChannels->clear();
     spikeChannels->clear();
@@ -93,8 +83,8 @@ void SourceSimThread::updateSettings(OwnedArray<ContinuousChannel>* continuousCh
     sourceBuffers.clear();
     sources.clear();
 
-    std::vector<std::string> probeNames = { 
-        "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O" , "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
+    std::vector<std::string> probeNames = {
+        "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
     };
 
     for (int i = 0; i < settings.numProbes; i++)
@@ -104,179 +94,169 @@ void SourceSimThread::updateSettings(OwnedArray<ContinuousChannel>* continuousCh
         String apBandName = "Probe-" + probeNames[i] + "-AP";
         String lfpBandName = "Probe-" + probeNames[i] + "-LFP";
 
-        DataStream::Settings apSettings{
+        DataStream::Settings apSettings {
             apBandName,
             "Neural data sampled @ 30kHz ",
-            "SP" + String(i) + "_AP",
+            "SP" + String (i) + "_AP",
             30000.0f
         };
 
-        dataStreams->add(new DataStream(apSettings));
+        dataStreams->add (new DataStream (apSettings));
 
-        sources.add(new SimulatedSource(apBandName, settings.channelsPerProbe, 30000.0f, SimulatedSourceType::AP_BAND));
-        sourceBuffers.add(new DataBuffer(settings.channelsPerProbe, 48000));
+        sources.add (new SimulatedSource (apBandName, settings.channelsPerProbe, 30000.0f, SimulatedSourceType::AP_BAND));
+        sourceBuffers.add (new DataBuffer (settings.channelsPerProbe, 48000));
         sources.getLast()->buffer = sourceBuffers.getLast();
 
         for (int j = 0; j < settings.channelsPerProbe; j++)
         {
-
-            ContinuousChannel::Settings channelSettings
-            {
+            ContinuousChannel::Settings channelSettings {
                 ContinuousChannel::Type::ELECTRODE,
-                "CH" + String(j + 1),
-                "AP voltage from electrode " + String(j + 1),
+                "CH" + String (j + 1),
+                "AP voltage from electrode " + String (j + 1),
                 "source",
                 0.195f, // BITVOLTS VALUE
                 dataStreams->getLast()
             };
 
-            continuousChannels->add(new ContinuousChannel(channelSettings));
+            continuousChannels->add (new ContinuousChannel (channelSettings));
         }
 
         EventChannel* apSyncLine;
 
-        EventChannel::Settings apSyncSettings{
+        EventChannel::Settings apSyncSettings {
             EventChannel::Type::TTL,
             "AP Sync Line",
-            "Synchronization signal from the AP band of simulated probe " + String(i),
+            "Synchronization signal from the AP band of simulated probe " + String (i),
             "probe.sync",
             dataStreams->getLast()
         };
 
-        apSyncLine = new EventChannel(apSyncSettings);
-        eventChannels->add(apSyncLine);
+        apSyncLine = new EventChannel (apSyncSettings);
+        eventChannels->add (apSyncLine);
 
         //std::cout << "Probe " << i << " LFP; " << settings.channelsPerProbe << " channels." << std::endl;
 
-        DataStream::Settings lfpSettings{
+        DataStream::Settings lfpSettings {
             lfpBandName,
             "Neural data sampled @ 2.5kHz ",
-            "SP" + String(i) + "_LFP",
+            "SP" + String (i) + "_LFP",
             2500.0f
         };
 
-        dataStreams->add(new DataStream(lfpSettings));
-        sources.add(new SimulatedSource(lfpBandName, settings.channelsPerProbe, 2500.0, SimulatedSourceType::LFP_BAND));
-        sourceBuffers.add(new DataBuffer(settings.channelsPerProbe, 48000));
+        dataStreams->add (new DataStream (lfpSettings));
+        sources.add (new SimulatedSource (lfpBandName, settings.channelsPerProbe, 2500.0, SimulatedSourceType::LFP_BAND));
+        sourceBuffers.add (new DataBuffer (settings.channelsPerProbe, 48000));
         sources.getLast()->buffer = sourceBuffers.getLast();
 
         for (int j = 0; j < settings.channelsPerProbe; j++)
         {
-
-            ContinuousChannel::Settings channelSettings
-            {
+            ContinuousChannel::Settings channelSettings {
                 ContinuousChannel::Type::ELECTRODE,
-                "CH" + String(j + 1),
-                "LFP voltage from electrode " + String(j + 1),
+                "CH" + String (j + 1),
+                "LFP voltage from electrode " + String (j + 1),
                 "source",
                 0.195f, // BITVOLTS VALUE
                 dataStreams->getLast()
             };
 
-            continuousChannels->add(new ContinuousChannel(channelSettings));
+            continuousChannels->add (new ContinuousChannel (channelSettings));
         }
 
         EventChannel* lfpSyncLine;
 
-        EventChannel::Settings lfpSyncSettings{
+        EventChannel::Settings lfpSyncSettings {
             EventChannel::Type::TTL,
             "LFP Sync Line",
-            "Synchronization signal from the LFP band of simulated probe " + String(i),
+            "Synchronization signal from the LFP band of simulated probe " + String (i),
             "probe.sync",
             dataStreams->getLast()
         };
 
-        lfpSyncLine = new EventChannel(lfpSyncSettings);
-        eventChannels->add(lfpSyncLine);
-
+        lfpSyncLine = new EventChannel (lfpSyncSettings);
+        eventChannels->add (lfpSyncLine);
     }
 
     for (int i = 0; i < settings.numNIDAQ; i++)
     {
-
         //std::cout << "NI Device " << i << "; " << settings.channelsPerNIDAQ << " channels." << std::endl;
 
-        String nidaqName = "Dev" + String(i);
+        String nidaqName = "Dev" + String (i);
 
-        DataStream::Settings nidaqSettings{
+        DataStream::Settings nidaqSettings {
             nidaqName,
             "NIDAQ @ 30 kHz ",
-            "NI" + String(i),
+            "NI" + String (i),
             30000.0f
         };
 
-        dataStreams->add(new DataStream(nidaqSettings));
-        sources.add(new SimulatedSource(nidaqName, settings.channelsPerNIDAQ, 30000.0f, SimulatedSourceType::NIDAQ));
-        sourceBuffers.add(new DataBuffer(settings.channelsPerNIDAQ, 48000));
+        dataStreams->add (new DataStream (nidaqSettings));
+        sources.add (new SimulatedSource (nidaqName, settings.channelsPerNIDAQ, 30000.0f, SimulatedSourceType::NIDAQ));
+        sourceBuffers.add (new DataBuffer (settings.channelsPerNIDAQ, 48000));
         sources.getLast()->buffer = sourceBuffers.getLast();
 
         for (int j = 0; j < settings.channelsPerNIDAQ; j++)
         {
-
-            ContinuousChannel::Settings channelSettings
-            {
+            ContinuousChannel::Settings channelSettings {
                 ContinuousChannel::Type::ADC,
-                "CH" + String(j + 1),
-                "ADC voltage from channel " + String(j + 1),
+                "CH" + String (j + 1),
+                "ADC voltage from channel " + String (j + 1),
                 "source",
                 0.195f, // BITVOLTS VALUE
                 dataStreams->getLast()
             };
 
-            continuousChannels->add(new ContinuousChannel(channelSettings));
+            continuousChannels->add (new ContinuousChannel (channelSettings));
         }
 
         EventChannel* nidaqSyncLine;
 
-        EventChannel::Settings nidaqSyncSettings{
+        EventChannel::Settings nidaqSyncSettings {
             EventChannel::Type::TTL,
             "NIDAQ Sync Line",
-            "Synchronization signal from the NIDAQ " + String(i),
+            "Synchronization signal from the NIDAQ " + String (i),
             "probe.sync",
             dataStreams->getLast()
         };
 
-        nidaqSyncLine = new EventChannel(nidaqSyncSettings);
-        eventChannels->add(nidaqSyncLine);
-
+        nidaqSyncLine = new EventChannel (nidaqSyncSettings);
+        eventChannels->add (nidaqSyncLine);
     }
 }
 
-
-void SourceSimThread::parameterValueChanged(Parameter* param)
+void SourceSimThread::parameterValueChanged (Parameter* param)
 {
-    LOGC("Parameter value changed: ", param->getName(), ". New value: ", param->getValueAsString());
+    LOGC ("Parameter value changed: ", param->getName(), ". New value: ", param->getValueAsString());
 
-    if (param->getName().equalsIgnoreCase("clk_hz"))
+    if (param->getName().equalsIgnoreCase ("clk_hz"))
     {
-        settings.clkFreq = ((FloatParameter*)param)->getValue();
+        settings.clkFreq = ((FloatParameter*) param)->getValue();
         for (auto source : sources)
-            source->updateClockFrequency(settings.clkFreq);
+            source->updateClockFrequency (settings.clkFreq);
     }
-    else if (param->getName().equalsIgnoreCase("npx_chans"))
+    else if (param->getName().equalsIgnoreCase ("npx_chans"))
     {
-        settings.channelsPerProbe = ((IntParameter*)param)->getIntValue();
+        settings.channelsPerProbe = ((IntParameter*) param)->getIntValue();
     }
-    else if (param->getName().equalsIgnoreCase("npx_probes"))
+    else if (param->getName().equalsIgnoreCase ("npx_probes"))
     {
-        settings.numProbes = ((IntParameter*)param)->getIntValue();
+        settings.numProbes = ((IntParameter*) param)->getIntValue();
     }
-    else if (param->getName().equalsIgnoreCase("nidaq_chans"))
+    else if (param->getName().equalsIgnoreCase ("nidaq_chans"))
     {
-        settings.channelsPerNIDAQ = ((IntParameter*)param)->getIntValue();
+        settings.channelsPerNIDAQ = ((IntParameter*) param)->getIntValue();
     }
-    else if (param->getName().equalsIgnoreCase("nidaq_devices"))
+    else if (param->getName().equalsIgnoreCase ("nidaq_devices"))
     {
-        settings.numNIDAQ = ((IntParameter*)param)->getIntValue();
+        settings.numNIDAQ = ((IntParameter*) param)->getIntValue();
     }
 
-    if (!param->getName().equalsIgnoreCase("clk_hz"))
-        CoreServices::updateSignalChain(sse);
+    if (! param->getName().equalsIgnoreCase ("clk_hz"))
+        CoreServices::updateSignalChain (sse);
 }
 
 bool SourceSimThread::foundInputSource()
 {
-    return true; 
+    return true;
 }
 
 bool SourceSimThread::startAcquisition()

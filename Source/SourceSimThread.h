@@ -21,7 +21,6 @@
 
 */
 
-
 #ifndef __SOURCESIMTHREAD_H__
 #define __SOURCESIMTHREAD_H__
 
@@ -35,11 +34,11 @@ class SourceSimEditor;
 
 struct PluginSettingsObject
 {
-	int clkFreq; // Hz
-	int numProbes;
-	int channelsPerProbe;
-	int numNIDAQ;
-	int channelsPerNIDAQ;
+    int clkFreq; // Hz
+    int numProbes;
+    int channelsPerProbe;
+    int numNIDAQ;
+    int channelsPerNIDAQ;
 };
 
 /**
@@ -52,64 +51,56 @@ struct PluginSettingsObject
 
 class SourceSimThread : public DataThread
 {
-
 public:
+    /** Constructor */
+    SourceSimThread (SourceNode* sn);
 
-	/** Constructor */
-	SourceSimThread(SourceNode* sn);
+    /** Destructor */
+    ~SourceSimThread();
 
-	/** Destructor */
-	~SourceSimThread();
+    /** Static method to create DataThread */
+    static DataThread* createDataThread (SourceNode* sn);
 
-	/** Static method to create DataThread */
-	static DataThread* createDataThread(SourceNode* sn);
+    /** Creates the custom editor */
+    std::unique_ptr<GenericEditor> createEditor (SourceNode* sn);
 
-	/** Creates the custom editor */
-	std::unique_ptr<GenericEditor> createEditor(SourceNode* sn);
-
-	/**Create & register parameters*/
+    /**Create & register parameters*/
     void registerParameters() override;
 
-	/** Not used -- data buffers are updated inside simulated sources*/
-	bool updateBuffer() { return true;  }
+    /** Not used -- data buffers are updated inside simulated sources*/
+    bool updateBuffer() { return true; }
 
-	/** Returns true if the data source is connected, false otherwise.*/
-	bool foundInputSource();
+    /** Returns true if the data source is connected, false otherwise.*/
+    bool foundInputSource();
 
-	/** Initializes data transfer.*/
-	bool startAcquisition();
+    /** Initializes data transfer.*/
+    bool startAcquisition();
 
-	/** Stops data transfer.*/
-	bool stopAcquisition();
+    /** Stops data transfer.*/
+    bool stopAcquisition();
 
-	// DataThread Methods
-	void updateSettings(OwnedArray<ContinuousChannel>* continuousChannels,
-		OwnedArray<EventChannel>* eventChannels,
-		OwnedArray<SpikeChannel>* spikeChannels,
-		OwnedArray<DataStream>* sourceStreams,
-		OwnedArray<DeviceInfo>* devices,
-		OwnedArray<ConfigurationObject>* configurationObjects);
-	
-	void updateClkFreq(int freq, float tol);
-	void updateClkEnable(int subProcIdx, bool enable);
+    // DataThread Methods
+    void updateSettings (OwnedArray<ContinuousChannel>* continuousChannels,
+                         OwnedArray<EventChannel>* eventChannels,
+                         OwnedArray<SpikeChannel>* spikeChannels,
+                         OwnedArray<DataStream>* sourceStreams,
+                         OwnedArray<DeviceInfo>* devices,
+                         OwnedArray<ConfigurationObject>* configurationObjects);
 
-	/* Called when a parameter value is updated, to allow plugin-specific responses*/
-	void parameterValueChanged(Parameter* param) override;
+    void updateClkFreq (int freq, float tol);
+    void updateClkEnable (int subProcIdx, bool enable);
+
+    /* Called when a parameter value is updated, to allow plugin-specific responses*/
+    void parameterValueChanged (Parameter* param) override;
 
 private:
+    OwnedArray<SimulatedSource> sources;
 
-	OwnedArray<SimulatedSource> sources;
+    SourceSimEditor* sse;
 
-	SourceSimEditor* sse;
+    PluginSettingsObject settings;
 
-	PluginSettingsObject settings;
-
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SourceSimThread);
-
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SourceSimThread);
 };
 
-
-
-
-
-#endif  // __NEUROPIXTHREAD_H_2C4CBD67__
+#endif // __NEUROPIXTHREAD_H_2C4CBD67__

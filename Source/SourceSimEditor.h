@@ -34,15 +34,14 @@
 class NumericEntry : public Label
 {
 public:
+    /** Constructor */
+    NumericEntry (String name, String text) : Label (name, text) {};
 
-	/** Constructor */
-	NumericEntry(String name, String text) : Label(name, text) {};
+    /** Destructor */
+    ~NumericEntry() {};
 
-	/** Destructor */
-	~NumericEntry() {};
-
-	/** Creates the editor component */
-	virtual TextEditor* createEditorComponent() override;
+    /** Creates the editor component */
+    virtual TextEditor* createEditorComponent() override;
 };
 
 /** 
@@ -54,30 +53,26 @@ public:
 class SourceSimEditor : public GenericEditor
 {
 public:
+    /** Constructor */
+    SourceSimEditor (GenericProcessor* parentNode, SourceSimThread* thread);
 
-	/** Constructor */
-	SourceSimEditor(GenericProcessor* parentNode, SourceSimThread* thread);
-
-	/** Destructor */
-	virtual ~SourceSimEditor();
-
+    /** Destructor */
+    virtual ~SourceSimEditor();
 
 private:
+    ScopedPointer<Label> clockLabel;
+    ScopedPointer<Label> freqLabel;
 
-	ScopedPointer<Label> clockLabel;
-	ScopedPointer<Label> freqLabel;
+    ScopedPointer<Label> deviceLabel;
+    ScopedPointer<Label> channelsLabel;
+    ScopedPointer<Label> quantityLabel;
 
-	ScopedPointer<Label> deviceLabel;
-	ScopedPointer<Label> channelsLabel;
-	ScopedPointer<Label> quantityLabel;
+    ScopedPointer<Label> NPXDeviceLabel;
+    ScopedPointer<Label> NIDAQDeviceLabel;
 
-	ScopedPointer<Label> NPXDeviceLabel;
-	ScopedPointer<Label> NIDAQDeviceLabel;
+    SourceSimThread* thread;
 
-	SourceSimThread* thread;
-
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SourceSimEditor);
-
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SourceSimEditor);
 };
 
-#endif 
+#endif
