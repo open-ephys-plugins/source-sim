@@ -55,7 +55,7 @@ void SourceSimThread::registerParameters()
     settings.numNIDAQ = 1;
     settings.channelsPerNIDAQ = 16;
 
-    addIntParameter (Parameter::PROCESSOR_SCOPE, "clk_hz", "Clock Frequency", "Clock Frequency", settings.clkFreq, 0, 10000, false);
+    addIntParameter (Parameter::PROCESSOR_SCOPE, "clk_hz", "Clock Frequency", "Clock Frequency", settings.clkFreq, 1, 10000, false);
 
     addIntParameter (Parameter::PROCESSOR_SCOPE, "npx_chans", "NPX Chans", "Number of channels per probe", settings.channelsPerProbe, 1, 10000, true);
 
