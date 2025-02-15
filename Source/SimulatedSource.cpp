@@ -30,6 +30,7 @@ SimulatedSource::SimulatedSource (String name, int channels_, float sampleRate_,
     sampleRate = sampleRate_;
 
     clkEnabled = true; //TODO: make this configurable
+    clk_period = 1.0f; // 1 Hz
 
     switch (type)
     {

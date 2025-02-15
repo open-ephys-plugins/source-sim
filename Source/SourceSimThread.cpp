@@ -106,6 +106,7 @@ void SourceSimThread::updateSettings (OwnedArray<ContinuousChannel>* continuousC
         sources.add (new SimulatedSource (apBandName, settings.channelsPerProbe, 30000.0f, SimulatedSourceType::AP_BAND));
         sourceBuffers.add (new DataBuffer (settings.channelsPerProbe, 48000));
         sources.getLast()->buffer = sourceBuffers.getLast();
+        sources.getLast()->updateClockFrequency (settings.clkFreq);
 
         for (int j = 0; j < settings.channelsPerProbe; j++)
         {
