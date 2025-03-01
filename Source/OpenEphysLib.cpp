@@ -46,7 +46,7 @@ extern "C" EXPORT void getLibInfo (Plugin::LibraryInfo* info)
     info->name = "Source Simulator";
 
     //Version of the library, used only for information
-    info->libVersion = "0.1.0";
+    info->libVersion = "0.1.1";
     info->numPlugins = NUM_PLUGINS;
 }
 extern "C" EXPORT int getPluginInfo (int index, Plugin::PluginInfo* info)
