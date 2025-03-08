@@ -62,7 +62,7 @@ void SourceSimThread::registerParameters()
 
     addBooleanParameter (Parameter::PROCESSOR_SCOPE, "npx_type", "NPX Type", "Toggle Neuropixels probe type (1.0 = true, 2.0 = false)", true, true);
 
-    addIntParameter (Parameter::PROCESSOR_SCOPE, "npx_probes", "NPX Probes", "Number of probes", settings.numProbes, 0, 20, true);
+    addIntParameter (Parameter::PROCESSOR_SCOPE, "npx_probes", "NPX Probes", "Number of probes", settings.numProbes, 0, 32, true);
 
     addIntParameter (Parameter::PROCESSOR_SCOPE, "nidaq_chans", "NIDAQ Chans", "Number of channels per device", settings.channelsPerNIDAQ, 1, 32, true);
 
