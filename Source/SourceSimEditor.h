@@ -66,6 +66,7 @@ private:
     ScopedPointer<Label> deviceLabel;
     ScopedPointer<Label> channelsLabel;
     ScopedPointer<Label> quantityLabel;
+    ScopedPointer<Label> lfpLabel;
 
     ScopedPointer<Label> NPXDeviceLabel;
     ScopedPointer<Label> NIDAQDeviceLabel;

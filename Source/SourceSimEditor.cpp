@@ -26,7 +26,7 @@
 SourceSimEditor::SourceSimEditor (GenericProcessor* parentNode, SourceSimThread* t)
     : GenericEditor (parentNode)
 {
-    desiredWidth = 180;
+    desiredWidth = 220;
     thread = t;
 
     clockLabel = new Label ("clkFreqLabel", "CLK");
@@ -54,7 +54,11 @@ SourceSimEditor::SourceSimEditor (GenericProcessor* parentNode, SourceSimThread*
     quantityLabel->setBounds (138, 55, 40, 20);
     addAndMakeVisible (quantityLabel);
 
-    NPXDeviceLabel = new Label ("NPX1 Probe", "NPX1 Probe");
+    lfpLabel = new Label ("LFP:", "LFP");
+    lfpLabel->setBounds (176, 55, 40, 20);
+    addAndMakeVisible (lfpLabel);
+
+    NPXDeviceLabel = new Label ("NPX Probe", "NPX Probe");
     NPXDeviceLabel->setBounds (5, 80, 85, 20);
     addAndMakeVisible (NPXDeviceLabel);
 
@@ -65,6 +69,10 @@ SourceSimEditor::SourceSimEditor (GenericProcessor* parentNode, SourceSimThread*
     addTextBoxParameterEditor (Parameter::PROCESSOR_SCOPE, "npx_probes", 140, 80);
     getParameterEditor ("npx_probes")->setLayout (ParameterEditor::nameHidden);
     getParameterEditor ("npx_probes")->setSize (30, 20);
+
+     addToggleParameterEditor (Parameter::PROCESSOR_SCOPE, "npx_type", 176, 80);
+    getParameterEditor ("npx_type")->setLayout (ParameterEditor::nameHidden);
+    getParameterEditor ("npx_type")->setSize (40, 20);
 
     NIDAQDeviceLabel = new Label ("NIDAQ", "NIDAQ-Sim");
     NIDAQDeviceLabel->setBounds (5, 105, 85, 20);

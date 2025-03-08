@@ -54,10 +54,13 @@ void SourceSimThread::registerParameters()
     settings.channelsPerProbe = 384;
     settings.numNIDAQ = 1;
     settings.channelsPerNIDAQ = 16;
+    settings.probeType = true;
 
     addIntParameter (Parameter::PROCESSOR_SCOPE, "clk_hz", "Clock Frequency", "Clock Frequency", settings.clkFreq, 1, 10000, false);
 
     addIntParameter (Parameter::PROCESSOR_SCOPE, "npx_chans", "NPX Chans", "Number of channels per probe", settings.channelsPerProbe, 1, 10000, true);
+
+    addBooleanParameter (Parameter::PROCESSOR_SCOPE, "npx_type", "NPX Type", "Toggle Neuropixels probe type (1.0 = true, 2.0 = false)", true, true);
 
     addIntParameter (Parameter::PROCESSOR_SCOPE, "npx_probes", "NPX Probes", "Number of probes", settings.numProbes, 0, 20, true);
 
@@ -84,7 +87,7 @@ void SourceSimThread::updateSettings (OwnedArray<ContinuousChannel>* continuousC
     sources.clear();
 
     std::vector<std::string> probeNames = {
-        "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
+        "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "AA", "BB", "CC", "DD", "EE", "FF"
     };
 
     for (int i = 0; i < settings.numProbes; i++)
@@ -137,44 +140,48 @@ void SourceSimThread::updateSettings (OwnedArray<ContinuousChannel>* continuousC
 
         //std::cout << "Probe " << i << " LFP; " << settings.channelsPerProbe << " channels." << std::endl;
 
-        DataStream::Settings lfpSettings {
-            lfpBandName,
-            "Neural data sampled @ 2.5kHz ",
-            "SP" + String (i) + "_LFP",
-            2500.0f
-        };
-
-        dataStreams->add (new DataStream (lfpSettings));
-        sources.add (new SimulatedSource (lfpBandName, settings.channelsPerProbe, 2500.0, SimulatedSourceType::LFP_BAND));
-        sourceBuffers.add (new DataBuffer (settings.channelsPerProbe, 48000));
-        sources.getLast()->buffer = sourceBuffers.getLast();
-
-        for (int j = 0; j < settings.channelsPerProbe; j++)
+        if (settings.probeType) // NP 1.0 = true
         {
-            ContinuousChannel::Settings channelSettings {
-                ContinuousChannel::Type::ELECTRODE,
-                "CH" + String (j + 1),
-                "LFP voltage from electrode " + String (j + 1),
-                "source",
-                0.195f, // BITVOLTS VALUE
+            DataStream::Settings lfpSettings {
+                lfpBandName,
+                "Neural data sampled @ 2.5kHz ",
+                "SP" + String (i) + "_LFP",
+                2500.0f
+            };
+
+            dataStreams->add (new DataStream (lfpSettings));
+            sources.add (new SimulatedSource (lfpBandName, settings.channelsPerProbe, 2500.0, SimulatedSourceType::LFP_BAND));
+            sourceBuffers.add (new DataBuffer (settings.channelsPerProbe, 48000));
+            sources.getLast()->buffer = sourceBuffers.getLast();
+
+            for (int j = 0; j < settings.channelsPerProbe; j++)
+            {
+                ContinuousChannel::Settings channelSettings {
+                    ContinuousChannel::Type::ELECTRODE,
+                    "CH" + String (j + 1),
+                    "LFP voltage from electrode " + String (j + 1),
+                    "source",
+                    0.195f, // BITVOLTS VALUE
+                    dataStreams->getLast()
+                };
+
+                continuousChannels->add (new ContinuousChannel (channelSettings));
+            }
+
+            EventChannel* lfpSyncLine;
+
+            EventChannel::Settings lfpSyncSettings {
+                EventChannel::Type::TTL,
+                "LFP Sync Line",
+                "Synchronization signal from the LFP band of simulated probe " + String (i),
+                "probe.sync",
                 dataStreams->getLast()
             };
 
-            continuousChannels->add (new ContinuousChannel (channelSettings));
+            lfpSyncLine = new EventChannel (lfpSyncSettings);
+            eventChannels->add (lfpSyncLine);
         }
 
-        EventChannel* lfpSyncLine;
-
-        EventChannel::Settings lfpSyncSettings {
-            EventChannel::Type::TTL,
-            "LFP Sync Line",
-            "Synchronization signal from the LFP band of simulated probe " + String (i),
-            "probe.sync",
-            dataStreams->getLast()
-        };
-
-        lfpSyncLine = new EventChannel (lfpSyncSettings);
-        eventChannels->add (lfpSyncLine);
     }
 
     for (int i = 0; i < settings.numNIDAQ; i++)
@@ -242,6 +249,10 @@ void SourceSimThread::parameterValueChanged (Parameter* param)
     {
         settings.numProbes = ((IntParameter*) param)->getIntValue();
     }
+	else if (param->getName().equalsIgnoreCase ("npx_type"))
+	{
+		settings.probeType = ((BooleanParameter*) param)->getBoolValue();
+	}
     else if (param->getName().equalsIgnoreCase ("nidaq_chans"))
     {
         settings.channelsPerNIDAQ = ((IntParameter*) param)->getIntValue();

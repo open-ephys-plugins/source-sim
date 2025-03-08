@@ -39,6 +39,7 @@ struct PluginSettingsObject
     int channelsPerProbe;
     int numNIDAQ;
     int channelsPerNIDAQ;
+    bool probeType; // true = 1.0, false = 2.0
 };
 
 /**
