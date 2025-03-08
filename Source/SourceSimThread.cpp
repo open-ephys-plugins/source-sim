@@ -62,9 +62,9 @@ void SourceSimThread::registerParameters()
 
     addBooleanParameter (Parameter::PROCESSOR_SCOPE, "npx_type", "NPX Type", "Toggle Neuropixels probe type (1.0 = true, 2.0 = false)", true, true);
 
-    addIntParameter (Parameter::PROCESSOR_SCOPE, "npx_probes", "NPX Probes", "Number of probes", settings.numProbes, 0, 32, true);
+    addIntParameter (Parameter::PROCESSOR_SCOPE, "npx_probes", "NPX Probes", "Number of probes", settings.numProbes, 0, 52, true);
 
-    addIntParameter (Parameter::PROCESSOR_SCOPE, "nidaq_chans", "NIDAQ Chans", "Number of channels per device", settings.channelsPerNIDAQ, 1, 32, true);
+    addIntParameter (Parameter::PROCESSOR_SCOPE, "nidaq_chans", "NIDAQ Chans", "Number of channels per device", settings.channelsPerNIDAQ, 1, 48, true);
 
     addIntParameter (Parameter::PROCESSOR_SCOPE, "nidaq_devices", "NIDAQ Devices", "Number of NIDAQs", settings.numNIDAQ, 0, 20, true);
 }
@@ -87,7 +87,7 @@ void SourceSimThread::updateSettings (OwnedArray<ContinuousChannel>* continuousC
     sources.clear();
 
     std::vector<std::string> probeNames = {
-        "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "AA", "BB", "CC", "DD", "EE", "FF"
+        "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "AA", "BB", "CC", "DD", "EE", "FF", "GG", "HH", "II", "JJ", "KK", "LL", "MM", "NN", "OO", "PP", "QQ", "RR", "SS", "TT", "UU", "VV", "WW", "XX", "YY", "ZZ"
     };
 
     for (int i = 0; i < settings.numProbes; i++)
