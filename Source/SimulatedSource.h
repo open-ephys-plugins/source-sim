@@ -18343,7 +18343,7 @@ private:
     uint64 eventCode;
     float clk_period;
 
-    float samples[384 * MAX_SAMPLES_PER_BUFFER];
+    float samples[10000 * MAX_SAMPLES_PER_BUFFER];
     int64 sampleNumbers[MAX_SAMPLES_PER_BUFFER];
     double timestamps[MAX_SAMPLES_PER_BUFFER];
     uint64 event_codes[MAX_SAMPLES_PER_BUFFER];
