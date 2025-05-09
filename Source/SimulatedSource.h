@@ -18329,6 +18329,7 @@ private:
     void run() override;
 
     SimulatedData simulatedData;
+    double simulatedTimestamp;
 
     std::vector<float>* data;
     int availableSamples;

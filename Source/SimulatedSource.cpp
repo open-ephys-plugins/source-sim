@@ -24,7 +24,8 @@
 #include "SimulatedSource.h"
 
 SimulatedSource::SimulatedSource (String name, int channels_, float sampleRate_, SimulatedSourceType type)
-    : Thread (name)
+    : Thread (name),
+    simulatedTimestamp(0.0)
 {
     numChannels = channels_;
     sampleRate = sampleRate_;
@@ -83,7 +84,8 @@ void SimulatedSource::run()
             }
 
             sampleNumbers[sample_num] = sampleNumber++;
-            timestamps[sample_num] = -1.0;
+            timestamps[sample_num] = simulatedTimestamp;
+            simulatedTimestamp += 1.0 / sampleRate;
 
             if (clk_period > 0)
             {

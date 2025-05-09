@@ -101,7 +101,8 @@ void SourceSimThread::updateSettings (OwnedArray<ContinuousChannel>* continuousC
             apBandName,
             "Neural data sampled @ 30kHz ",
             "SP" + String (i) + "_AP",
-            30000.0f
+            30000.0f,
+            true
         };
 
         dataStreams->add (new DataStream (apSettings));
