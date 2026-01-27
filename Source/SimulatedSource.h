@@ -32,7 +32,7 @@
 #include <thread>
 
 #define PI 3.14159f
-#define MAX_SAMPLES_PER_BUFFER 300
+#define MAX_SAMPLES_PER_BUFFER 4096
 
 using namespace std::chrono;
 
